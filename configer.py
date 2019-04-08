@@ -1,12 +1,13 @@
 """TODO"""
 import requests
 import sys
-
+import platform
+from colors import bcolors
 
 
 class Configer:
 	"""Get all possible info about app from it's URL"""
-	def __init__(self, url, status='enterprise'):
+	def __init__(self, url, status='development'):
 		self.url = url
 		self.r = self.get_headers()
 		self.cookie = self.r.headers['Set-Cookie']
@@ -15,24 +16,25 @@ class Configer:
 		self.server = self.r.headers['Server']
 		self.compression = self.r.headers['Content-Encoding']
 		if status == 'enterprise':
-			self.os = 'detect here'
+			self.os = 'TODO'
 		else:
-			self.os = sys.platform
-		print(self.os)
+			self.os = platform.platform()
+		
 
-		print("###########################################################################")
-		print("###########################################################################")
+		print(bcolors.OKGREEN + "###########################################################################")
+		print(bcolors.OKGREEN + "###########################################################################")
 		print()
-		print(f"Connecting to {self.url}...")
-		print("---------------------------------------------------------------------------")	
-		print(f"GET REQUEST with cookie: {self.cookie}")	
-		print(f"Time of connection: {self.date}")	
-		print(f"Encoding: {self.encoding}")
-		print(f"Server: {self.server}")
-		print(f"Compression: {self.compression}")
+		print(bcolors.OKGREEN + f"Connecting to {self.url}...")
+		print(bcolors.OKGREEN + "---------------------------------------------------------------------------")	
+		print(bcolors.OKGREEN + f"GET REQUEST with cookie: {self.cookie}")	
+		print(bcolors.OKGREEN + f"Time of connection: {self.date}")	
+		print(bcolors.OKGREEN + f"Encoding: {self.encoding}")
+		print(bcolors.OKGREEN + f"Server: {self.server}")
+		print(bcolors.OKGREEN + f"Operating system: {self.os}")
+		print(bcolors.OKGREEN + f"Compression: {self.compression}")
 		print()
-		print("###########################################################################")
-		print("###########################################################################")
+		print(bcolors.OKGREEN + "###########################################################################")
+		print(bcolors.OKGREEN + "###########################################################################")
 
 
 	def get_headers(self):
