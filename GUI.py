@@ -9,7 +9,7 @@ def donothing():
    button.pack()
 
 tk = Tk()
-tk.minsize(800, 600)
+tk.minsize(300, 600)
 menubar = Menu(tk)
 
 # File
@@ -21,7 +21,7 @@ filemenu.add_command(label="Save as...", command=donothing)
 filemenu.add_command(label="Close", command=donothing)
 filemenu.add_separator()
 filemenu.add_command(label="Exit", command=tk.quit)
-menubar.add_cascade(label="File", menu=filemenu)
+menubar.add_cascade(label="Хакнуть сайт", menu=filemenu)
 
 # Edit
 editmenu = Menu(menubar, tearoff=0)
@@ -32,13 +32,13 @@ editmenu.add_command(label="Copy", command=donothing)
 editmenu.add_command(label="Paste", command=donothing)
 editmenu.add_command(label="Delete", command=donothing)
 editmenu.add_command(label="Select All", command=donothing)
-menubar.add_cascade(label="Edit", menu=editmenu)
+menubar.add_cascade(label="Видалити сайт", menu=editmenu)
 
 #Help
 helpmenu = Menu(menubar, tearoff=0)
 helpmenu.add_command(label="Help Index", command=donothing)
 helpmenu.add_command(label="About...", command=donothing)
-menubar.add_cascade(label="Help", menu=helpmenu)
+menubar.add_cascade(label="Хуй", menu=helpmenu)
 
 
 Label(tk, text = "Target URL").grid(row = 0, sticky = W)
@@ -55,8 +55,12 @@ def call_sqlmap():
     os.system(f"python sqlmap.py -u {url_field.get()}")
 
 
-Button(tk, text = "submit",
+Button(tk, text = "ЖОПА",
            command = call_sqlmap).grid(row = 5, sticky = W)
+
+poetry = "Власність М.І. Рєзнікова (с)"
+label2 = Label(text=poetry, justify=LEFT, fg="grey")
+label2.place(relx=0, rely=0.96)
 
 # os.system(f'python test.py -{getInput()}')
 
