@@ -1,6 +1,7 @@
 import time
 import sys
 from colors import bcolors
+from progressbar import ProgressBar
 
 
 def spin_dash(seconds):
@@ -13,6 +14,13 @@ def spin_dash(seconds):
 	    sys.stdout.flush()
 	print()
 
+def update_progress(progress):
+	pbar = ProgressBar()
+	for x in pbar(range(100)):
+		time.sleep(0.01 * progress)
+
+
+
 def owasp_scan_header():
 	"""TODO"""
 	print(" $$$$$$\  $$\      $$\  $$$$$$\   $$$$$$\  $$$$$$$\     ")                                    
@@ -24,5 +32,5 @@ def owasp_scan_header():
 	print(" $$$$$$  |$$  /   \$$ |$$ |  $$ |\$$$$$$  |$$ |      $$$$$$$  |\$$$$$$$\\ $$$$$$$ |$$ |  $$ |")
 	print(" \______/ \__/     \__|\__|  \__| \______/ \__|      \_______/  \_______|\_______|\__|  \__|")
 	print()
-	print(bcolors.BOLD + "                                 made by Tarnavskyi Denys")
+	print(bcolors.BOLD + "Author: Tarnavskyi D.")
 	print()

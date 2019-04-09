@@ -9,9 +9,9 @@ import ascii_art
 
 class Configer:
 	"""Get all possible info about app from it's URL"""
-	def __init__(self, url, status='enterprise'):
+	def __init__(self, url, local=False):
 		self.url = url
-		self.status = status 				 # check if development mode
+		self.local = local 				 # check if development mode
 		self.r = self.get_headers() 		 # http request header
 		self.detected = getSimple(self.url)  # web-app confifuration
 		self.cookie = self.get_cookie()
@@ -44,13 +44,18 @@ class Configer:
 
 	def output_configuration(self):
 		"""Print human-readable results of analysis"""
+		# ascii_art.spin_dash(2)
 		ascii_art.spin_dash(2)
 		print(bcolors.OKGREEN + "###########################################################################")
 		print(bcolors.OKGREEN + "###########################################################################")
 		print()
 		ascii_art.owasp_scan_header()   
+		print(bcolors.OKGREEN + "###########################################################################")
+		print(bcolors.OKGREEN + "###########################################################################")
+		print()
 		print(bcolors.OKGREEN + "Connecting to " + bcolors.OKBLUE + self.url + bcolors.OKGREEN + "...")
-		ascii_art.spin_dash(4)
+		# ascii_art.spin_dash(4)
+		ascii_art.update_progress(2)
 		print(bcolors.OKGREEN + "---------------------------------------------------------------------------")	
 		print(bcolors.OKGREEN + f"GET REQUEST with cookie: {self.cookie}")	
 		print(bcolors.OKGREEN + f"Time of connection: {self.date}")	
@@ -77,13 +82,13 @@ class Configer:
 
 	def get_os(self):
 		"""TODO"""
-		if self.status == 'enterprise':
+		if not self.local:
 			try:
 				return self.detected['operating-systems']
 			except:
 				return bcolors.FAIL + 'hidden'
 		else:
-			return platform.platform()
+			return platform.platform() + bcolors.HEADER + ' [CURRENCT PC]'
 
 	def get_cookie(self):
 		"""TODO"""
