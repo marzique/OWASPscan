@@ -3,20 +3,25 @@ import requests
 import sys
 import platform
 from colors import bcolors
+from wappalyzer.analyzer import getSimple, getDetail
 
 
 class Configer:
 	"""Get all possible info about app from it's URL"""
-	def __init__(self, url, status='development'):
+	def __init__(self, url, status='enterprise'):
 		self.url = url
 		self.r = self.get_headers()
-		self.cookie = self.r.headers['Set-Cookie']
+		try:
+			self.cookie = self.r.headers['Set-Cookie']
+		except KeyError:
+			self.cookie = bcolors.FAIL + "hidden"
+
 		self.date = self.r.headers['Date']
 		self.encoding = self.r.encoding
 		self.server = self.r.headers['Server']
 		self.compression = self.r.headers['Content-Encoding']
 		if status == 'enterprise':
-			self.os = 'TODO'
+			self.os = bcolors.FAIL + 'TODO'
 		else:
 			self.os = platform.platform()
 		
@@ -24,7 +29,7 @@ class Configer:
 		print(bcolors.OKGREEN + "###########################################################################")
 		print(bcolors.OKGREEN + "###########################################################################")
 		print()
-		print(bcolors.OKGREEN + f"Connecting to {self.url}...")
+		print(bcolors.OKGREEN + "Connecting to " + bcolors.OKBLUE + self.url + bcolors.OKGREEN + "...")
 		print(bcolors.OKGREEN + "---------------------------------------------------------------------------")	
 		print(bcolors.OKGREEN + f"GET REQUEST with cookie: {self.cookie}")	
 		print(bcolors.OKGREEN + f"Time of connection: {self.date}")	
@@ -58,4 +63,7 @@ class Configer:
 
 		return r
 		
-kek = Configer('https://uapolicy.org')
+kek = Configer("https://rex.knu.ua/")
+
+# print(getSimple("https://rex.knu.ua/"))
+print(getDetail("https://rex.knu.ua/"))
