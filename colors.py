@@ -26,3 +26,4 @@ class bcolors:
     BOLD = '\033[1m' if get_platform() != 'Windows' else ''
     UNDERLINE = '\033[4m' if get_platform() != 'Windows' else ''
     RESET =  '\u001b[0m' if get_platform() != 'Windows' else ''
+    CYAN =  '\033[1;36m' if get_platform() != 'Windows' else ''

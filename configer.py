@@ -2,9 +2,11 @@
 import requests
 import sys
 import platform
+from time import gmtime, strftime
 from colors import bcolors
 from wappalyzer.analyzer import getSimple, getDetail
 import ascii_art
+from bs4 import BeautifulSoup
 
 
 class Configer:
@@ -16,10 +18,10 @@ class Configer:
 		self.detected = getSimple(self.url)  # web-app confifuration
 		self.cookie = self.get_cookie()
 
-		self.date = self.r.headers['Date']
+		self.date = self.get_date()
 		self.encoding = self.r.encoding
 		self.server = self.get_server()
-		self.compression = self.r.headers['Content-Encoding']
+		self.compression = self.get_compresshion()
 		self.os = self.get_os()
 		self.programming_lang = self.get_language()
 
@@ -42,6 +44,20 @@ class Configer:
 		    sys.exit(1)
 		return r
 
+	def get_compresshion(self):
+		"""TODO"""
+		try:
+			return self.r.headers['Content-Encoding']
+		except:
+			return bcolors.FAIL + "hidden"
+
+	def get_date(self):
+		"""Return current GMT time from response header or manually"""
+		try:
+			return self.r.headers['Date']
+		except:
+			return strftime("%a, %d %b %Y %X GMT", gmtime())
+			
 	def output_configuration(self):
 		"""Print human-readable results of analysis"""
 		# ascii_art.spin_dash(2)
@@ -66,8 +82,6 @@ class Configer:
 		print(bcolors.OKGREEN + f"Compression: {self.compression}")
 		print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
 		print()
-		print(bcolors.OKGREEN + "###########################################################################")
-		print(bcolors.OKGREEN + "###########################################################################")
 		print(bcolors.RESET)
 
 	def get_server(self):
