@@ -26,3 +26,4 @@ def owasp_scan_header():
 	print()
 	print(bcolors.BOLD + "                                 made by Tarnavskyi Denys")
 	print()
+	

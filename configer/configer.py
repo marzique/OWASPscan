@@ -2,9 +2,9 @@
 import requests
 import sys
 import platform
-from colors import bcolors
-from wappalyzer.analyzer import getSimple, getDetail
-import ascii_art
+from ..helpers.colors import bcolors
+from ..helpers import ascii_art
+from ..wappalyzer.analyzer import getSimple, getDetail
 
 
 class Configer:
@@ -44,7 +44,6 @@ class Configer:
 
 	def output_configuration(self):
 		"""Print human-readable results of analysis"""
-		ascii_art.spin_dash(2)
 		print(bcolors.OKGREEN + "###########################################################################")
 		print(bcolors.OKGREEN + "###########################################################################")
 		print()
@@ -99,7 +98,7 @@ class Configer:
 		
 # kek = Configer("https://uapolicy.org/")
 # kek = Configer("https://rex.knu.ua/")
-kek = Configer("https://www.behance.net/")
+kek = Configer("https://www.defense.gov/")
 kek.output_configuration()
 
 # print(getDetail("https://rex.knu.ua/"))
