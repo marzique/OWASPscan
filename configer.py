@@ -70,7 +70,10 @@ class Configer:
 		try:
 			return self.detected['web-servers']
 		except:
-			return bcolors.WARNING + self.r.headers['Server']
+			try:
+				return bcolors.WARNING + self.r.headers['Server']
+			except:
+				return bcolors.FAIL + 'hidden'
 
 	def get_os(self):
 		"""TODO"""
@@ -97,9 +100,3 @@ class Configer:
 			# TODO: https://www.owasp.org/index.php/Testing_for_HTTP_Parameter_pollution_(OTG-INPVAL-004)
 			return bcolors.FAIL + 'hidden'
 		
-# kek = Configer("https://uapolicy.org/")
-# kek = Configer("https://rex.knu.ua/")
-kek = Configer("https://www.behance.net/")
-kek.output_configuration()
-
-# print(getDetail("https://rex.knu.ua/"))
