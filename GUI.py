@@ -1,12 +1,15 @@
+"""TODO"""
 from tkinter import *
 import os
 
+def execute_configer():
+    os.system(f"python3 application.py {r_var.get()} {url_field.get()}")
 
 def donothing():
-   filewin = Toplevel(tk)
-   filewin.minsize(500, 300)
-   button = Button(filewin, text="Do nothing button")
-   button.pack()
+    filewin = Toplevel(tk)
+    filewin.minsize(500, 300)
+    button = Button(filewin, text="Do nothing button")
+    button.pack()
 
 tk = Tk()
 tk.minsize(600, 400)
@@ -40,24 +43,21 @@ helpmenu.add_command(label="Help Index", command=donothing)
 helpmenu.add_command(label="About...", command=donothing)
 menubar.add_cascade(label="Help", menu=helpmenu)
 
-
 Label(tk, text = "Target URL").grid(row = 0, sticky = W)
 url_field = Entry(tk)
+url_field.grid(row = 0, column = 1, padx = 20)
 
-url_field.grid(row = 0, column = 1)
+r_var = StringVar()
+r_var.set('--enterprise')
 
+Radiobutton(tk, text='localhost', padx = 20, variable=r_var, value='--local').grid(row = 1, column = 1)
+Radiobutton(tk, text='enterprise', padx = 20, variable=r_var, value='--enterprise').grid(row = 2, column = 1)
 
-def execute_configer():
-    os.system(f"python3 application.py --local {url_field.get()}")
+Button(tk, text = "Begin scan", command = execute_configer).grid(row = 5, sticky = W)
 
-Button(tk, text = "Begin scan",
-           command = execute_configer).grid(row = 5, sticky = W)
-
-poetry = "OWASPscan 2019"
-label2 = Label(text=poetry, justify=LEFT, fg="grey")
+copyright = "OWASPscan 2019"
+label2 = Label(text=copyright, justify=LEFT, fg="grey")
 label2.place(relx=0, rely=0.96)
-
-# os.system(f'python test.py -{getInput()}')
 
 tk.config(menu=menubar)
 tk.mainloop()
