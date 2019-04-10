@@ -7,7 +7,7 @@ from helpers.colors import bcolors
 from wappalyzer.analyzer import getSimple, getDetail
 import helpers.ascii_art as art
 from bs4 import BeautifulSoup
-
+from checkssl import check_site
 
 class Configer:
     """Get all possible info about app configuration from it's URL"""
@@ -20,14 +20,15 @@ class Configer:
         self.date = self.get_date()
         self.encoding = self.r.encoding
         self.server = self.get_server()
-        self.compression = self.get_compresshion()
+        self.compression = self.get_compression()
         self.os = self.get_os()
         self.programming_lang = self.get_language()
+        self.certificate = check_site(self.url)
 
     def get_headers(self):
         """Get headers from request and handle possible errors"""
         try:
-            r = requests.get(self.url, timeout=3)
+            r = requests.get(self.url, timeout=3, verify=True)
             r.raise_for_status()
         except requests.exceptions.HTTPError as errh:
             print("Http Error:", errh)
@@ -43,7 +44,7 @@ class Configer:
             sys.exit(1)
         return r
 
-    def get_compresshion(self):
+    def get_compression(self):
         """TODO"""
         try:
             return self.r.headers['Content-Encoding']
@@ -74,6 +75,7 @@ class Configer:
         print(bcolors.OKGREEN + "---------------------------------------------------------------------------")  
         print(bcolors.OKGREEN + f"GET REQUEST with cookie: {self.cookie}")  
         print(bcolors.OKGREEN + f"Time of connection: {self.date}") 
+        print(f"Certificate: {self.certificate}") 
         print(bcolors.OKGREEN + f"Server: {self.server}")
         print(bcolors.OKGREEN + f"Operating system: {self.os}")
         print(bcolors.OKGREEN + f"Encoding: {self.encoding}")
