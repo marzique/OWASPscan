@@ -7,6 +7,9 @@ from helpers.colors import bcolors
 from wappalyzer.analyzer import getSimple, getDetail
 import helpers.ascii_art as art
 from checkssl import check_site
+from helpers.helpers import strip_url
+from bs4 import BeautifulSoup
+import requests
 
 
 class Configer:
@@ -24,6 +27,7 @@ class Configer:
         self.os = self.get_os()
         self.programming_lang = self.get_language()
         self.certificate = check_site(self.url)
+        self.pages = []
 
     def get_headers(self):
         """Get headers from request and handle possible errors"""
@@ -57,7 +61,7 @@ class Configer:
             return self.r.headers['Date']
         except:
             return strftime("%a, %d %b %Y %X GMT", gmtime())
-            
+
     def output_configuration(self):
         """Print human-readable results of analysis"""
         # art.spin_dash(2)
@@ -65,23 +69,29 @@ class Configer:
         print(bcolors.OKGREEN + "###########################################################################")
         print(bcolors.OKGREEN + "###########################################################################")
         print()
-        art.owasp_scan_header()   
+        art.owasp_scan_header()
         print(bcolors.OKGREEN + "###########################################################################")
         print(bcolors.OKGREEN + "###########################################################################")
         print()
         print(bcolors.OKGREEN + "Connecting to " + bcolors.OKBLUE + self.url + bcolors.OKGREEN + "...")
         # ascii_art.spin_dash(4)
         art.update_progress(2)
-        print(bcolors.OKGREEN + "---------------------------------------------------------------------------")  
-        print(bcolors.OKGREEN + f"GET REQUEST with cookie: {self.cookie}")  
-        print(bcolors.OKGREEN + f"Time of connection: {self.date}") 
-        print(f"Certificate: {self.certificate}") 
+        print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
+        print(bcolors.OKGREEN + "----------------------------Configuration scan-----------------------------")
+        print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
+        print(bcolors.OKGREEN + f"GET REQUEST with cookie: {self.cookie}")
+        print(bcolors.OKGREEN + f"Time of connection: {self.date}")
+        print(f"Certificate: {self.certificate}")
         print(bcolors.OKGREEN + f"Server: {self.server}")
         print(bcolors.OKGREEN + f"Operating system: {self.os}")
         print(bcolors.OKGREEN + f"Encoding: {self.encoding}")
         print(bcolors.OKGREEN + f"Programming language: {self.programming_lang}")
         print(bcolors.OKGREEN + f"Compression: {self.compression}")
         print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
+        print(bcolors.OKGREEN + "--------------------------Page spider crawl...-----------------------------")
+        print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
+        self.pages = self.get_pages(self.url)
+        print(bcolors.OKGREEN + f"Number of pages: {len(self.pages)}")
         print()
         print(bcolors.RESET)
 
@@ -119,4 +129,31 @@ class Configer:
         except:
             # TODO: https://www.owasp.org/index.php/Testing_for_HTTP_Parameter_pollution_(OTG-INPVAL-004)
             return bcolors.FAIL + 'hidden'
-        
+
+    def get_links_on_page(self, url):
+        links = []
+        # Getting the webpage, creating a Response object.
+        response = requests.get(url)
+        # Extracting the source code of the page.
+        data = response.text
+        # Passing the source code to BeautifulSoup to create a BeautifulSoup object for it.
+        soup = BeautifulSoup(data, 'lxml')
+        # Extracting all the <a> tags into a list.
+        tags = soup.find_all('a')
+        # Extracting URLs from the attribute href in the <a> tags.
+        for tag in tags:
+            if tag.get('href') and strip_url(self.url) in tag.get('href'):
+                links.append(tag.get('href'))
+        return list(set(links))
+
+    def get_pages(self, url):
+        links = self.get_links_on_page(self.url)
+        visited = [self.url]
+        for page in links:
+            if len(links) > 100:
+                return bcolors.WARNING + 'More than 100 links!'
+            if page not in visited:
+                self.get_links_on_page(page)
+                visited.append(page)
+        return visited
+

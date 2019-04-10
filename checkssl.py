@@ -6,7 +6,7 @@ import socket
 import re
 from datetime import datetime
 from helpers.colors import bcolors
-
+from helpers.helpers import strip_url
 
 
 def check_site(url):
@@ -21,7 +21,3 @@ def check_site(url):
     except ssl.SSLError as e:
         return bcolors.FAIL + 'No certificate found'
 
-def strip_url(url):
-    """Return plain domain name"""
-    rec = re.compile(r"https?://(www\.)?")
-    return rec.sub('', url).strip().strip('/')
