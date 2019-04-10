@@ -1,10 +1,19 @@
 """TODO"""
 from tkinter import *
 import os
+from application import start_configer
 
 
 def execute_configer():
-    os.system(f"python3 application.py {r_var.get()} {url_field.get()}")
+    # os.system(f"python3 application.py {r_var.get()} {url_field.get()}")
+    # sys.exit(1)
+    mode = None
+    url = url_field.get()
+    if r_var.get() == '--enterprise':
+        mode = 'enterprise'
+    elif r_var.get() == '--local':
+        mode = 'local'
+    start_configer(mode=mode, url=url)
     sys.exit(1)
 
 def donothing():
