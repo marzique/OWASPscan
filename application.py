@@ -12,7 +12,7 @@ def start_configer(mode=None, url=None):
         local = True
     elif mode == 'enterprise':
         local = False
-    appdata = Configer(url, local=mode)
+    appdata = Configer(url, local=local)
     appdata.output_configuration()
 
 
