@@ -4,6 +4,7 @@ import os
 
 def execute_configer():
     os.system(f"python3 application.py {r_var.get()} {url_field.get()}")
+    sys.exit(1)
 
 def donothing():
     filewin = Toplevel(tk)
