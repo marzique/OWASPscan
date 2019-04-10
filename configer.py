@@ -6,8 +6,8 @@ from time import gmtime, strftime
 from helpers.colors import bcolors
 from wappalyzer.analyzer import getSimple, getDetail
 import helpers.ascii_art as art
-from bs4 import BeautifulSoup
 from checkssl import check_site
+
 
 class Configer:
     """Get all possible info about app configuration from it's URL"""
@@ -103,7 +103,7 @@ class Configer:
             except:
                 return bcolors.FAIL + 'hidden'
         else:
-            return platform.platform() + bcolors.HEADER + ' [CURRENCT PC]'
+            return platform.platform() + bcolors.HEADER + ' [CURRENT PC]'
 
     def get_cookie(self):
         """TODO"""
