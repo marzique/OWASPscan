@@ -14,7 +14,9 @@ def donothing():
     button.pack()
 
 tk = Tk()
+tk.title('OWASPscan')
 tk.minsize(600, 400)
+
 menubar = Menu(tk)
 
 # File
