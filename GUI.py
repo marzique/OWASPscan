@@ -5,8 +5,6 @@ from application import start_configer
 
 
 def execute_configer():
-    # os.system(f"python3 application.py {r_var.get()} {url_field.get()}")
-    # sys.exit(1)
     mode = None
     url = url_field.get()
     if r_var.get() == '--enterprise':
