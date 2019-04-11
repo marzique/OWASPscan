@@ -7,7 +7,6 @@ from helpers.colors import bcolors
 from wappalyzer.analyzer import getSimple, getDetail
 import helpers.ascii_art as art
 from checkssl import check_site
-from helpers.helpers import strip_url
 from bs4 import BeautifulSoup
 import requests
 from tqdm import tqdm

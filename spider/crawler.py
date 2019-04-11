@@ -3,6 +3,7 @@ from urllib.parse import urlsplit, urlunsplit, urljoin, urlparse
 from urllib.error import  URLError, HTTPError
 import re
 from datetime import datetime
+from helpers.helpers import strip_url
 
 class Crawler:
 	"""Crawl website and find all pages from links"""
@@ -83,10 +84,14 @@ class Crawler:
 						self.add_url(link, links, self.exclude)
 
 			for link in links:
-				if link not in self.visited_links:
+
+				if link not in self.visited_links and strip_url(link) == strip_url(self.url):
 					link = self.normalize(link)
 					self.visited_links.append(link)
-					self.crawl(link)
+					try:
+						self.crawl(link)
+					except:
+						continue
 
 	def add_url(self, link, link_list, exclude_pattern=None):
 		link = self.normalize(link)
@@ -115,6 +120,8 @@ class Crawler:
 	def is_relative(self, url):
 		host = urlparse(url).netloc
 		return host == ''
+
+
 
 #	TODO Proper related domain/ subdomains check
 #	def same_domain(self, url):
