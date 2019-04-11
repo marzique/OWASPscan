@@ -10,6 +10,7 @@ from checkssl import check_site
 from helpers.helpers import strip_url
 from bs4 import BeautifulSoup
 import requests
+from tqdm import tqdm
 
 
 class Configer:
@@ -28,6 +29,19 @@ class Configer:
         self.programming_lang = self.get_language()
         self.certificate = check_site(self.url)
         self.pages = []
+
+    def fix_url(self, url):
+        """TODO"""
+        try:
+            if url[0] == url[1] == '/':
+                return 'http:' + url
+            elif url[0] == '/' and url != '/':
+                return 'http://' + strip_url(self.url) + url
+            else:
+                return url
+        except:
+            return url
+
 
     def get_headers(self):
         """Get headers from request and handle possible errors"""
@@ -91,7 +105,10 @@ class Configer:
         print(bcolors.OKGREEN + "--------------------------Page spider crawl...-----------------------------")
         print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
         self.pages = self.get_pages(self.url)
+        if len(self.pages) > 99:
+            print(bcolors.WARNING, end='')
         print(bcolors.OKGREEN + f"Number of pages: {len(self.pages)}")
+        print(self.pages)
         print()
         print(bcolors.RESET)
 
@@ -131,9 +148,10 @@ class Configer:
             return bcolors.FAIL + 'hidden'
 
     def get_links_on_page(self, url):
+        """return list of all unique links on current page"""
         links = []
         # Getting the webpage, creating a Response object.
-        response = requests.get(url)
+        response = requests.get(self.fix_url(url))
         # Extracting the source code of the page.
         data = response.text
         # Passing the source code to BeautifulSoup to create a BeautifulSoup object for it.
@@ -142,18 +160,17 @@ class Configer:
         tags = soup.find_all('a')
         # Extracting URLs from the attribute href in the <a> tags.
         for tag in tags:
-            if tag.get('href') and strip_url(self.url) in tag.get('href'):
+            if tag.get('href') and (strip_url(self.url) in tag.get('href') or tag.get('href')[0] == '/'):
                 links.append(tag.get('href'))
         return list(set(links))
 
     def get_pages(self, url):
+        """Visit all pages possible and return them, stop count on 100"""
         links = self.get_links_on_page(self.url)
         visited = [self.url]
-        for page in links:
-            if len(links) > 100:
-                return bcolors.WARNING + 'More than 100 links!'
+        for page in tqdm(links, desc='links', unit_scale=1):
             if page not in visited:
-                self.get_links_on_page(page)
+                links.extend(self.get_links_on_page(page))
                 visited.append(page)
         return visited
 

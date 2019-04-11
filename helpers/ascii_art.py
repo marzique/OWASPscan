@@ -1,7 +1,7 @@
 import time
 import sys
 from .colors import bcolors
-from progressbar import ProgressBar
+from tqdm import tqdm
 
 
 def spin_dash(seconds):
@@ -15,14 +15,13 @@ def spin_dash(seconds):
 
 def update_progress(progress):
 	"""Show progress bar while looping"""
-	pbar = ProgressBar()
-	for x in pbar(range(100)):
+	for x in tqdm(range(100)):
 		time.sleep(0.01 * progress)
 
 def owasp_scan_header():
 	"""Show starting ASCII ART"""
-	print(" $$$$$$\  $$\      $$\  $$$$$$\   $$$$$$\  $$$$$$$\     ")                                    
-	print("$$  __$$\ $$ | $\  $$ |$$  __$$\ $$  __$$\ $$  __$$\      ")                                  
+	print(" $$$$$$\  $$\      $$\  $$$$$$\   $$$$$$\  $$$$$$$\     ")
+	print("$$  __$$\ $$ | $\  $$ |$$  __$$\ $$  __$$\ $$  __$$\      ")
 	print("$$ /  $$ |$$ |$$$\ $$ |$$ /  $$ |$$ /  \__|$$ |  $$ | $$$$$$$\  $$$$$$$\ $$$$$$\  $$$$$$$\  ")
 	print("$$ |  $$ |$$ $$ $$\$$ |$$$$$$$$ |\$$$$$$\  $$$$$$$  |$$  _____|$$  _____|\____$$\ $$  __$$\ ")
 	print("$$ |  $$ |$$$$  _$$$$ |$$  __$$ | \____$$\ $$  ____/ \$$$$$$\  $$ /      $$$$$$$ |$$ |  $$ |")
