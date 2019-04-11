@@ -11,6 +11,7 @@ from helpers.helpers import strip_url
 from bs4 import BeautifulSoup
 import requests
 from tqdm import tqdm
+from spider.crawler import Crawler
 
 
 class Configer:
@@ -104,11 +105,8 @@ class Configer:
         print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
         print(bcolors.OKGREEN + "--------------------------Page spider crawl...-----------------------------")
         print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
-        self.pages = self.get_pages(self.fix_url(self.url))
-        if len(self.pages) > 99:
-            print(bcolors.WARNING, end='')
-        print(bcolors.OKGREEN + f"Number of pages: {len(self.pages)}")
-        print(self.pages)
+        self.pages = self.get_pages(self.url)
+        print(bcolors.OKGREEN + f"Webpages found: {len(self.pages)}")
         print()
         print(bcolors.RESET)
 
@@ -147,35 +145,11 @@ class Configer:
             # TODO: https://www.owasp.org/index.php/Testing_for_HTTP_Parameter_pollution_(OTG-INPVAL-004)
             return bcolors.FAIL + 'hidden'
 
-    def get_links_on_page(self, url):
-        """return list of all unique links on current page"""
-        links = []
-        try:
-            # Getting the webpage, creating a Response object.
-            response = requests.get(self.fix_url(url))
-        except requests.exceptions.MissingSchema as err:
-            print("ignoring bad url:", url)
-            return []
+    def get_pages(self, url, no_verbose=False):
+        """TODO"""
+        # initializeing crawler
+        crawler = Crawler(url, no_verbose)
 
-        # Extracting the source code of the page.
-        data = response.text
-        # Passing the source code to BeautifulSoup to create a BeautifulSoup object for it.
-        soup = BeautifulSoup(data, 'lxml')
-        # Extracting all the <a> tags into a list.
-        tags = soup.find_all('a')
-        # Extracting URLs from the attribute href in the <a> tags.
-        for tag in tags:
-            if tag.get('href') and (strip_url(self.url) in tag.get('href') or tag.get('href')[0] == '/'):
-                links.append(tag.get('href'))
-        return list(set(links))
-
-    def get_pages(self, url):
-        """Visit all pages possible and return them"""
-        links = self.get_links_on_page(self.url)
-        visited = [self.url]
-        for page in tqdm(links, desc='links', unit_scale=1):
-            if page not in visited:
-                links.extend(self.get_links_on_page(page))
-                visited.append(page)
-        return visited
-
+        # fetch links
+        return crawler.start()
+        
