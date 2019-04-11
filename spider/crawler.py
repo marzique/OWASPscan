@@ -5,9 +5,8 @@ import re
 from datetime import datetime
 
 class Crawler:
-
+	"""Crawl website and find all pages from links"""
 	def __init__(self, url, exclude=None, domain=None, no_verbose=False):
-
 		self.url = self.normalize(url)
 		self.host = urlparse(self.url).netloc
 		self.domain = domain
@@ -20,7 +19,6 @@ class Crawler:
 
 	def start(self):
 		self.crawl(self.url)
-
 		return self.found_links
 
 
@@ -37,7 +35,6 @@ class Crawler:
 		except URLError as e:
 			print('Error: Failed to reach server. ', e.reason)
 		else:
-
 			# Handle redirects
 			if url != response.geturl():
 				self.add_url(url, self.redirect_links, self.exclude)

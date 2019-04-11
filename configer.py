@@ -31,6 +31,7 @@ class Configer:
         self.certificate = check_site(self.url)
         self.pages = []
 
+
     def fix_url(self, url):
         """TODO"""
         try:
@@ -63,23 +64,24 @@ class Configer:
             sys.exit(1)
         return r
 
+
     def get_compression(self):
-        """TODO"""
         try:
             return self.r.headers['Content-Encoding']
         except:
             return bcolors.FAIL + "hidden"
 
+
     def get_date(self):
-        """Return current GMT time from response header or manually"""
+        """Return current GMT from response header or generate it  manually"""
         try:
             return self.r.headers['Date']
         except:
             return strftime("%a, %d %b %Y %X GMT", gmtime())
 
+
     def output_configuration(self):
         """Print human-readable results of analysis"""
-        # art.spin_dash(2)
         art.spin_dash(2)
         print(bcolors.OKGREEN + "###########################################################################")
         print(bcolors.OKGREEN + "###########################################################################")
@@ -89,7 +91,6 @@ class Configer:
         print(bcolors.OKGREEN + "###########################################################################")
         print()
         print(bcolors.OKGREEN + "Connecting to " + bcolors.OKBLUE + self.url + bcolors.OKGREEN + "...")
-        # ascii_art.spin_dash(4)
         art.update_progress(2)
         print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
         print(bcolors.OKGREEN + "----------------------------Configuration scan-----------------------------")
@@ -110,8 +111,11 @@ class Configer:
         print()
         print(bcolors.RESET)
 
+
     def get_server(self):
-        """TODO"""
+        """Try to get server type from header,
+        highlight 'proxy-like' server name with orange
+        """
         try:
             return self.detected['web-servers']
         except:
@@ -120,8 +124,8 @@ class Configer:
             except:
                 return bcolors.FAIL + 'hidden'
 
+
     def get_os(self):
-        """TODO"""
         if not self.local:
             try:
                 return self.detected['operating-systems']
@@ -130,26 +134,25 @@ class Configer:
         else:
             return platform.platform() + bcolors.HEADER + ' [CURRENT PC]'
 
+
     def get_cookie(self):
-        """TODO"""
         try:
             return self.r.headers['Set-Cookie']
         except KeyError:
             return bcolors.FAIL + "hidden"
 
+
     def get_language(self):
-        """TODO"""
+        """Try to get programming language from header"""
         try:
             return self.detected['programming-languages']
         except:
             # TODO: https://www.owasp.org/index.php/Testing_for_HTTP_Parameter_pollution_(OTG-INPVAL-004)
             return bcolors.FAIL + 'hidden'
 
-    def get_pages(self, url, no_verbose=False):
-        """TODO"""
-        # initializeing crawler
-        crawler = Crawler(url, no_verbose)
 
-        # fetch links
+    def get_pages(self, url, no_verbose=False):
+        """Return list of all webpages"""
+        crawler = Crawler(url, no_verbose)
         return crawler.start()
         
