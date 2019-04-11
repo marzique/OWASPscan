@@ -104,7 +104,7 @@ class Configer:
         print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
         print(bcolors.OKGREEN + "--------------------------Page spider crawl...-----------------------------")
         print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
-        self.pages = self.get_pages(self.url)
+        self.pages = self.get_pages(self.fix_url(self.url))
         if len(self.pages) > 99:
             print(bcolors.WARNING, end='')
         print(bcolors.OKGREEN + f"Number of pages: {len(self.pages)}")
@@ -150,8 +150,13 @@ class Configer:
     def get_links_on_page(self, url):
         """return list of all unique links on current page"""
         links = []
-        # Getting the webpage, creating a Response object.
-        response = requests.get(self.fix_url(url))
+        try:
+            # Getting the webpage, creating a Response object.
+            response = requests.get(self.fix_url(url))
+        except requests.exceptions.MissingSchema as err:
+            print("ignoring bad url:", url)
+            return []
+
         # Extracting the source code of the page.
         data = response.text
         # Passing the source code to BeautifulSoup to create a BeautifulSoup object for it.
