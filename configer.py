@@ -11,6 +11,7 @@ from bs4 import BeautifulSoup
 import requests
 from tqdm import tqdm
 from spider.crawler import Crawler
+from spider.adminpage import search_admin_pages
 
 
 class Configer:
@@ -29,6 +30,7 @@ class Configer:
         self.programming_lang = self.get_language()
         self.certificate = check_site(self.url)
         self.pages = []
+        self.adminpages = []
 
     def get_headers(self):
         """Get headers from request and handle possible errors"""
@@ -89,7 +91,13 @@ class Configer:
         print(bcolors.OKGREEN + f"Programming language: {self.programming_lang}")
         print(bcolors.OKGREEN + f"Compression: {self.compression}")
         print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
-        print(bcolors.OKGREEN + "--------------------------Page spider crawl...-----------------------------")
+        print(bcolors.OKGREEN + "--------------------------Search for admin pages---------------------------")
+        print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
+        self.adminpages = search_admin_pages(self.url, progress=0, ext='php' if 'PHP' in self.programming_lang else 'a', 
+        									 strict=True, visible=False, wordlist_file="spider/admin_login.txt")
+        print(bcolors.OKGREEN + f"admin/dashboard pages found: {len(self.adminpages)}")
+        print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
+        print(bcolors.OKGREEN + "-----------------------Search for all website pages------------------------")
         print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
         self.pages = self.get_pages(self.url)
         print(bcolors.OKGREEN + f"Webpages found: {len(self.pages)}")

@@ -19,5 +19,4 @@ def check_site(url):
         date_until = str(datetime.strptime(x509.get_notAfter().decode('ascii'), '%Y%m%d%H%M%SZ'))
         return 'valid until ' + date_until
     except ssl.SSLError as e:
-        return bcolors.FAIL + 'No certificate found'
-
+        return bcolors.FAIL + 'certificate not found'

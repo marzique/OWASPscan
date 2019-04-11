@@ -90,6 +90,9 @@ class Crawler:
 					self.visited_links.append(link)
 					try:
 						self.crawl(link)
+					except KeyboardInterrupt:  # make sure we don't lose everything should the user get bored
+						print()
+						break
 					except:
 						continue
 
