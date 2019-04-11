@@ -170,7 +170,7 @@ class Configer:
         return list(set(links))
 
     def get_pages(self, url):
-        """Visit all pages possible and return them, stop count on 100"""
+        """Visit all pages possible and return them"""
         links = self.get_links_on_page(self.url)
         visited = [self.url]
         for page in tqdm(links, desc='links', unit_scale=1):
