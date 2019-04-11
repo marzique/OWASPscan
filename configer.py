@@ -31,20 +31,6 @@ class Configer:
         self.certificate = check_site(self.url)
         self.pages = []
 
-
-    def fix_url(self, url):
-        """TODO"""
-        try:
-            if url[0] == url[1] == '/':
-                return 'http:' + url
-            elif url[0] == '/' and url != '/':
-                return 'http://' + strip_url(self.url) + url
-            else:
-                return url
-        except:
-            return url
-
-
     def get_headers(self):
         """Get headers from request and handle possible errors"""
         try:

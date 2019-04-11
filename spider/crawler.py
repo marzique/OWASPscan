@@ -21,8 +21,21 @@ class Crawler:
 		self.crawl(self.url)
 		return self.found_links
 
+	def fix_url(self, url):
+		"""TODO"""
+		try:
+			if url[0] == url[1] == '/':
+				return 'http:' + url
+			elif url[0] == '/' and url != '/':
+				return 'http://' + strip_url(self.url) + url
+			else:
+				return url
+		except:
+			return url
+
 
 	def crawl(self, url):
+		url = self.fix_url(url)
 		if not self.no_verbose:
 			print(len(self.found_links) + 1, "Parsing: " + url)
 		try:
