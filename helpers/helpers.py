@@ -9,5 +9,5 @@ def strip_url(url):
     rec = re.compile(r"https?://(www\.)?")
     # TODO: remove averything after first slash
     stripped = str(rec.sub('', url).strip().strip('/').strip('//'))
-    head, sep, tail = stripped.partition('/')
+    head, _, _ = stripped.partition('/')
     return head
