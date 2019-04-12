@@ -29,5 +29,5 @@ def owasp_scan_header():
 	print(" $$$$$$  |$$  /   \$$ |$$ |  $$ |\$$$$$$  |$$ |      $$$$$$$  |\$$$$$$$\\ $$$$$$$ |$$ |  $$ |")
 	print(" \______/ \__/     \__|\__|  \__| \______/ \__|      \_______/  \_______|\_______|\__|  \__|")
 	print()
-	print(bcolors.CYAN + "Author: Tarnavskyi D.")
+	print("Author: Tarnavskyi D.")
 	print()

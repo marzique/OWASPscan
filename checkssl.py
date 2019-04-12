@@ -17,6 +17,6 @@ def check_site(url):
         cert = ssl.get_server_certificate((hostname, port))
         x509 = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, cert)
         date_until = str(datetime.strptime(x509.get_notAfter().decode('ascii'), '%Y%m%d%H%M%SZ'))
-        return 'valid until ' + date_until
+        return '\033[1;36mvalid until ' + date_until
     except ssl.SSLError as e:
         return bcolors.FAIL + 'certificate not found'

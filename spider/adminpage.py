@@ -51,7 +51,7 @@ def search_admin_pages(url, progress=0, ext="a", strict=False, visible=True, wor
             try:
                 resp = urllib.request.urlopen(panel_page)#try visiting the page
                 found.append(site)
-                print(f"\033[92m {site} page found")
+                print(f"\033[1;36m {site} page found \033[92m")
 
             except HTTPError as e:#investigate the HTTPError we got
                 c = e.getcode()
