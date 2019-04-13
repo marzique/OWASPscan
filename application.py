@@ -1,4 +1,4 @@
-"""Configurer wrapper"""
+"""Module's wrapper"""
 import argparse
 import sys
 from configer import Configer
@@ -15,10 +15,12 @@ def start_configer(mode=None, url=None):
         local = False
     c = Configer(url, local=local)
     c.output_configuration()
+    return c
 
-def start_loginer():
-    l = Loginer()
-    
+def start_loginer(c):
+    l = Loginer(c)
+    l.start_hack()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -33,3 +35,5 @@ if __name__ == "__main__":
         local = False
     c = Configer(args["URL"], local=local)
     c.output_configuration()
+    l = Loginer()
+    l.start_hack()

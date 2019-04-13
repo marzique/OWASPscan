@@ -11,8 +11,8 @@ def execute():
         mode = 'enterprise'
     elif r_var.get() == '--local':
         mode = 'local'
-    start_configer(mode=mode, url=url)
-    start_loginer()
+    c = start_configer(mode=mode, url=url)
+    start_loginer(c)
     sys.exit(1)
 
 def donothing():

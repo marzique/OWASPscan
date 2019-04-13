@@ -1,9 +1,12 @@
 """TODO"""
 
-class Loginer(object):
+class Loginer:
 	"""docstring for Loginer"""
-	def __init__(self):
-		self.start_hack()
+	def __init__(self, configer):
+		self.configer = configer
 	
 	def start_hack(self):
-		print('FAKING THE BLOODY LOGINER')
+		print("FAKING THE BLOODY LOGINER")
+		print(f"loginer knows admin pages: ")
+		for page in self.configer.adminpages:
+			print(page)
