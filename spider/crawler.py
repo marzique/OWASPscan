@@ -88,7 +88,7 @@ class Crawler:
 
 			for link in links:
 				link = remove_parameters(link)
-				if link not in self.visited_links and self.same_domain(link) and len(link) <= 250:
+				if link not in self.visited_links and self.same_domain(link) and len(link) <= 250: # fix this!
 					link = self.normalize(link)
 					self.visited_links.append(link)
 					try:

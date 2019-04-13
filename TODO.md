@@ -1,6 +1,6 @@
 ## bug fixes/features
+- find bloody bug which causes recursive url growth!
 
-----
 
 ## Refactor
 - separate 'configer' actions to their modules

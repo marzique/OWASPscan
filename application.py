@@ -2,6 +2,7 @@
 import argparse
 import sys
 from configer import Configer
+from loginer import Loginer
 
 
 def start_configer(mode=None, url=None):
@@ -12,9 +13,12 @@ def start_configer(mode=None, url=None):
         local = True
     elif mode == 'enterprise':
         local = False
-    appdata = Configer(url, local=local)
-    appdata.output_configuration()
+    c = Configer(url, local=local)
+    c.output_configuration()
 
+def start_loginer():
+    l = Loginer()
+    
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -27,5 +31,5 @@ if __name__ == "__main__":
         local = True
     elif args["enterprise"]:
         local = False
-    appdata = Configer(args["URL"], local=local)
-    appdata.output_configuration()
+    c = Configer(args["URL"], local=local)
+    c.output_configuration()
