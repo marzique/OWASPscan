@@ -1,5 +1,8 @@
+## bug fixes/features
+- do not consider redirects with 200 ok if url changed
+
 ## Refactor
-- separate con 'configer' actions to their modules
+- separate 'configer' actions to their modules
 
 ### Main Modules
 

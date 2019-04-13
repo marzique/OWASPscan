@@ -91,9 +91,9 @@ class Crawler:
 					try:
 						self.crawl(link)
 					except KeyboardInterrupt:  # make sure we don't lose everything should the user get bored
-						print()
-						break
-					except:
+						print('Stopped by user')
+						return
+					except: # bad link?
 						continue
 
 	def add_url(self, link, link_list, exclude_pattern=None):

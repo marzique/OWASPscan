@@ -5,6 +5,22 @@ See README.md or https://github.com/benhoyt/soft404 for documentation.
 soft404.py is released under the new BSD 3-clause license:
 http://opensource.org/licenses/BSD-3-Clause
 
+How it works
+Here’s just a quick overview of the algorithm, taken from the comment at the top of my code:
+
+Basically, you fetch the URL in question. If you get a hard 404, it’s easy: the page is dead. 
+But if it returns 200 OK with a page, then we don’t know if it’s a good page or a soft 404. 
+So we fetch a known bad URL (the parent directory of the original URL plus some random chars). 
+If that returns a hard 404 then we know the host returns hard 404s on errors, and since the 
+original page fetched okay, we know it must be good.
+
+But if the known dead URL returns a 200 OK as well, we know it’s a host which gives out soft 404s. 
+So then we need to test the contents of the two pages. If the content of the original URL is 
+(almost) identical to the content of the known bad page, the original must be a dead page too. 
+Otherwise, if the content of the original URL is different, it must be a good page.
+
+That’s the heart of it. HTTP redirects complicate things just slightly, but not much. 
+For more info, see my code or read the paper.
 
 Edits by Tarnavskyi Denys:
 - ported to python3 

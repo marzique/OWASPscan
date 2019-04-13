@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # credit: https://github.com/MonroCoury/admin-panel-finder/blob/master/admin_panel_sniffer.py
+"""TODO"""
 from datetime import datetime as dt
 import sys, random, optparse
 import urllib.request
