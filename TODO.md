@@ -1,3 +1,6 @@
+## Refactor
+- separate con 'configer' actions to their modules
+
 ### Main Modules
 
 ## INJECTOR:

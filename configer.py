@@ -93,8 +93,8 @@ class Configer:
         print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
         print(bcolors.OKGREEN + "--------------------------Search for admin pages---------------------------")
         print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
-        self.adminpages = search_admin_pages(self.url, progress=0, ext='php' if 'PHP' in self.programming_lang else 'a', 
-        									 strict=True, visible=False, wordlist_file="spider/admin_login.txt")
+        self.adminpages = search_admin_pages(self.url, progress=0, ext='php' if 'PHP' in self.programming_lang else 'a',
+        									 wordlist_file="spider/admin_login.txt")
         print(bcolors.OKGREEN + f"admin/dashboard pages found: {len(self.adminpages)}")
         print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
         print(bcolors.OKGREEN + "-----------------------Search for all website pages------------------------")

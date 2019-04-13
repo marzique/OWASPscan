@@ -5,6 +5,7 @@ import sys, random, optparse
 import urllib.request
 from urllib.error import  URLError, HTTPError
 from tqdm import tqdm
+from .soft404 import is_dead
 
 
 #custom header to avoid being blocked by the website
@@ -32,48 +33,22 @@ def loadWordList(wordlist_file, ext):#load pages to check from dictionary
     except FileNotFoundError:
         sys.exit("Couldn't find wordlist file!")
 
-def search_admin_pages(url, progress=0, ext="a", strict=False, visible=True, wordlist_file="admin_login.txt"):
+def search_admin_pages(url, progress=0, ext="a", wordlist_file="admin_login.txt"):
     print("\033[92m")
-    resp_codes = {403 : "request forbidden", 401 : "authentication required"}#HTTP response codes
+    resp_codes = {403 : "request forbidden", 401 : "authentication required"}# HTTP response codes
     found = []#list to hold the results we find
     url = adjusturlName(url)#correct url name for urllib
     attempts = loadWordList(wordlist_file, ext)
     
-    for link in tqdm(attempts[progress:]):#loop over every page in the wordlist file
+    for link in tqdm(attempts[progress:]): # loop over every page in the wordlist file
+        site = url + "/" + link
         try:
-            site = url + "/" + link
-
-            if visible:#show links as they're being tested
-                print("trying:", end=" ")
-
-            panel_page = urllib.request.Request(site, headers=custom_headers)
-            
-            try:
-                resp = urllib.request.urlopen(panel_page)#try visiting the page
+            if not is_dead(site):
                 found.append(site)
-                print(f"\033[1;36m {site} page found \033[92m")
-
-            except HTTPError as e:#investigate the HTTPError we got
-                c = e.getcode()
-                    
-                if c == 404:
-                    if visible:
-                        print("%s not found..." % site)
-                else:
-                    if not strict:
-                        print("%s potential positive.. %s" % (site, resp_codes[c]))
-                        found.append(site)
-
-            except URLError:
-                print("\033[91m invalid link or no internet connection!")
-                break
-            
-            except Exception as e2:
-                print("\033[91m an exception occured when trying {}... {}".format(site, e2))
-                continue
+                print(f"\033[1;36m {site} page found! \033[92m")
             progress += 1
-            
-        except KeyboardInterrupt:#make sure we don't lose everything should the user get bored
+
+        except KeyboardInterrupt: # make sure we don't lose everything should the user get bored
             print()
             break
 
@@ -83,9 +58,9 @@ def search_admin_pages(url, progress=0, ext="a", strict=False, visible=True, wor
     else:
         print("\033[93m could not find any panel pages... Make sure you're connected to the internet\n" \
               + "or try a different wordlist. total progress: %s" % progress)
-        return None
+        return []
 
 if __name__ == "__main__":
-    search_admin_pages('http://leafus.com.ua', progress=0, ext="php", strict=True, visible=False, wordlist_file="admin_login.txt")
+    search_admin_pages('http://leafus.com.ua', progress=0, ext="php", wordlist_file="admin_login.txt")
 
     
