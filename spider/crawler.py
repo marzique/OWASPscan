@@ -2,8 +2,9 @@ import urllib.request
 from urllib.parse import urlsplit, urlunsplit, urljoin, urlparse
 from urllib.error import  URLError, HTTPError
 import re
+import sys
 from datetime import datetime
-from helpers.helpers import strip_url
+from helpers.helpers import strip_url, remove_parameters
 
 class Crawler:
 	"""Crawl website and find all pages from links"""
@@ -34,6 +35,8 @@ class Crawler:
 		except:
 			return url
 
+	def same_domain(self, link):
+		return strip_url(link) == strip_url(self.url)
 
 	def crawl(self, url):
 		url = self.fix_url(url)
@@ -84,15 +87,16 @@ class Crawler:
 						self.add_url(link, links, self.exclude)
 
 			for link in links:
-
-				if link not in self.visited_links and strip_url(link) == strip_url(self.url):
+				link = remove_parameters(link)
+				if link not in self.visited_links and self.same_domain(link) and len(link) <= 250:
 					link = self.normalize(link)
 					self.visited_links.append(link)
 					try:
 						self.crawl(link)
 					except KeyboardInterrupt:  # make sure we don't lose everything should the user get bored
 						print('Stopped by user')
-						return
+						# return
+						break
 					except: # bad link?
 						continue
 
@@ -114,21 +118,18 @@ class Crawler:
 		anchor = ''
 		return urlunsplit((scheme, netloc, path, qs, anchor))
 
+
 	def is_internal(self, url):
 		host = urlparse(url).netloc
 		if self.domain:
 		   return self.domain in host
 		return host == self.host
 
+
 	def is_relative(self, url):
 		host = urlparse(url).netloc
 		return host == ''
 
-
-
-#	TODO Proper related domain/ subdomains check
-#	def same_domain(self, url):
-#		host = urlparse(url).netloc
 
 	def is_url(self, url):
 		scheme, netloc, path, qs, anchor = urlsplit(url)
