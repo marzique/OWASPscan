@@ -1,9 +1,11 @@
 ## bug fixes/features
-- do not consider redirects with 200 ok if url changed
+
+----
 
 ## Refactor
 - separate 'configer' actions to their modules
 
+------------
 ### Main Modules
 
 ## INJECTOR:
@@ -27,6 +29,7 @@
 
 ## CONFIGER
 - check for more sensitive info possible
+------------
 
 ### Output
 - Fancy PDF (or similar) report with GREEN vs RED parts, connect it with OWASP TOP 10 list
