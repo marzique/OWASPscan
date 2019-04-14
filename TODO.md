@@ -1,5 +1,7 @@
 ## bug fixes/features
 - find bloody bug which causes recursive url growth!
+- check/hack FTP
+- 
 
 
 ## Refactor

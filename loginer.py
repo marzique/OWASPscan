@@ -18,7 +18,8 @@ class Loginer:
 		so it's maybe will work faster. Or maybe we will make whole admin page finding here separately
 		"""
 		self.url = configer.url
-		self.adminpages = configer.adminpages
+		self.adminpages = configer.adminpages 
+		self.filtered_pages = []
 		# TODO
 
 	def start_hack(self):
@@ -29,9 +30,12 @@ class Loginer:
 
 	def get_raw_html(self, url):
 		"""Return HTML page from url"""
-		req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-		response = urllib.request.urlopen(req)
-		return str(response.read())
+		try:
+			req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+			response = urllib.request.urlopen(req)
+			return str(response.read())
+		except:
+			return None
 
 	def has_captcha(self, html):
 		if 'captcha' in html:
@@ -61,12 +65,29 @@ class Loginer:
 		else:
 			return False
 
+	def filter_pages(self, page_urls):
+		"""Create list of pages that has login forms in it"""
+		login_pages = []
+		for page in page_urls:
+			html = self.get_raw_html(page)
+			if html:
+				if not self.has_captcha(html):
+					if self.has_login_form(html):
+						login_pages.append(page)
+						print(f"{page} has login form!")
+				else:
+					print(f"{page} has CAPTCHA, ignoring")
+			else:
+				print(f"can't parse HTML from: {page}")
+		return login_pages
+
 if __name__ == "__main__":
 	from configer import Configer
 	c = Configer('https://inmac.org/login/')
 	log = Loginer(c)
-	url = input("provide url to check: ")
-	html = log.get_raw_html(url)
+	
+	pages = ['http://leafus.com.ua/', 'http://leafus.com.ua/wp-admin', 'http://indiana.tours/coming-soon/', 
+			 'https://stackoverflow.com/', 'https://inmac.org/login/'
+			 ]
 
-	print(f"page has CAPTCHA: {log.has_captcha(html)}")
-	print(f"page has login form: {log.has_login_form(html)}")
+	log.filter_pages(pages)
