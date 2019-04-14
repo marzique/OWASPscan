@@ -70,8 +70,8 @@ r_var = StringVar()
 
 r_var.set('--enterprise')
 
-Radiobutton(tk, text='localhost', variable=r_var, value='--local').grid(row = 1, column = 1, sticky = W)
-Radiobutton(tk, text='enterprise', variable=r_var, value='--enterprise').grid(row = 2, column = 1, sticky = W)
+Radiobutton(tk, text='localhost', variable=r_var, value='--local').grid(row = 1, column = 0, sticky = W)
+Radiobutton(tk, text='enterprise', variable=r_var, value='--enterprise').grid(row = 1, column = 1, sticky = W)
 
 Button(tk, text = "Begin scan", command = execute, bg="green", fg="white").grid(row = 5, sticky = W)
 
