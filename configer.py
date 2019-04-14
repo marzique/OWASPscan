@@ -7,8 +7,6 @@ from helpers.colors import bcolors
 from wappalyzer.analyzer import getSimple, getDetail
 import helpers.ascii_art as art
 from checkssl import check_site
-from bs4 import BeautifulSoup
-import requests
 from tqdm import tqdm
 from spider.crawler import Crawler
 from spider.adminpage import search_admin_pages

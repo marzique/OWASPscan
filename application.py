@@ -35,5 +35,5 @@ if __name__ == "__main__":
         local = False
     c = Configer(args["URL"], local=local)
     c.output_configuration()
-    l = Loginer()
+    l = Loginer(c)
     l.start_hack()
