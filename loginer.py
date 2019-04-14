@@ -11,7 +11,6 @@ from bs4 import BeautifulSoup
 import urllib.request
 
 
-
 class Loginer:
 	"""docstring for Loginer"""
 	def __init__(self, configer):

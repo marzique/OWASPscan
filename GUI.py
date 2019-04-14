@@ -1,5 +1,6 @@
 """TODO"""
 from tkinter import *
+from tkinter import messagebox
 import os
 from application import start_configer, start_loginer
 
@@ -7,6 +8,9 @@ from application import start_configer, start_loginer
 def execute():
     mode = None
     url = url_field.get()
+    if not url:
+        provide_url()
+        return
     if r_var.get() == '--enterprise':
         mode = 'enterprise'
     elif r_var.get() == '--local':
@@ -20,6 +24,9 @@ def donothing():
     filewin.minsize(500, 300)
     button = Button(filewin, text="Do nothing button")
     button.pack()
+
+def provide_url():
+    messagebox.showinfo('Error', 'Please provide target URL!')
 
 tk = Tk()
 tk.title('OWASPscan')
@@ -55,17 +62,18 @@ helpmenu.add_command(label="Help Index", command=donothing)
 helpmenu.add_command(label="About...", command=donothing)
 menubar.add_cascade(label="Help", menu=helpmenu)
 
-Label(tk, text = "Target URL").grid(row = 0, sticky = W)
+Label(tk, text = "Target URL:").grid(row = 0)
 url_field = Entry(tk)
-url_field.grid(row = 0, column = 1, padx = 20)
+url_field.grid(row = 0, column = 1, sticky = W)
 
 r_var = StringVar()
+
 r_var.set('--enterprise')
 
-Radiobutton(tk, text='localhost', padx = 20, variable=r_var, value='--local').grid(row = 1, column = 1)
-Radiobutton(tk, text='enterprise', padx = 20, variable=r_var, value='--enterprise').grid(row = 2, column = 1)
+Radiobutton(tk, text='localhost', variable=r_var, value='--local').grid(row = 1, column = 1, sticky = W)
+Radiobutton(tk, text='enterprise', variable=r_var, value='--enterprise').grid(row = 2, column = 1, sticky = W)
 
-Button(tk, text = "Begin scan", command = execute).grid(row = 5, sticky = W)
+Button(tk, text = "Begin scan", command = execute, bg="green", fg="white").grid(row = 5, sticky = W)
 
 copyright = "OWASPscan 2019"
 label2 = Label(text=copyright, justify=LEFT, fg="grey")
