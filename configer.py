@@ -88,9 +88,7 @@ class Configer:
         print(bcolors.OKGREEN + f"Encoding: {self.encoding}")
         print(bcolors.OKGREEN + f"Programming language: {self.programming_lang}")
         print(bcolors.OKGREEN + f"Compression: {self.compression}")
-        print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
         print(bcolors.OKGREEN + "--------------------------Search for admin pages---------------------------")
-        print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
         self.adminpages = search_admin_pages(self.url, progress=0, ext='php' if 'PHP' in self.programming_lang else 'a',
         									 wordlist_file="spider/admin_login.txt")
         print(bcolors.OKGREEN + f"admin/dashboard pages found: {len(self.adminpages)}")
@@ -99,7 +97,9 @@ class Configer:
         print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
         self.pages = self.get_pages(self.url)
         print(bcolors.OKGREEN + f"Webpages found: {len(self.pages)}")
-        print()
+        print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
+        print(bcolors.OKGREEN + "-----------------------Configuration scan completed------------------------")
+        print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
         print(bcolors.RESET)
 
 

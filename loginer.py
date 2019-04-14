@@ -19,8 +19,6 @@ class Loginer:
 		"""
 		self.url = configer.url
 		self.adminpages = configer.adminpages
-		self.bruteforcable = None
-		self.captcha = None
 		# TODO
 
 	def start_hack(self):
@@ -29,17 +27,11 @@ class Loginer:
 		for page in self.adminpages:
 			print(page)
 
-	def get_pages_with_forms(self, page_list):
-		for page in page_list:
-			pass
-
 	def get_raw_html(self, url):
-		"""TODO"""
+		"""Return HTML page from url"""
 		req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
 		response = urllib.request.urlopen(req)
-		html = response.read()
-
-		return str(html)
+		return str(response.read())
 
 	def has_captcha(self, html):
 		if 'captcha' in html:
@@ -47,8 +39,34 @@ class Loginer:
 		else:
 			return False
 
-if __name__ == "__main__":
-	log = Loginer('kek')
-	html = log.get_raw_html('https://rex.knu.ua/wp/wp-login.php')
+	def has_login_form(self, html):
+		"""Return True if html has form with 'login' and 'password' fields"""
+		soup = BeautifulSoup(html, 'html.parser')
+		form = soup.find("form")
+		if form:
+			input_fields = form.find_all('input')
+			count = 0
+			for field in input_fields:
+				if field['type'] == 'text':
+					# print(field['name'])
+					count += 1
+				elif field['type'] == 'password':
+					# print(field['name'])
+					count += 1
+			if count == 2:
+				# we have both login and password fields
+				return True
+			else:
+				return False
+		else:
+			return False
 
-	print(log.has_captcha(html))
+if __name__ == "__main__":
+	from configer import Configer
+	c = Configer('https://inmac.org/login/')
+	log = Loginer(c)
+	url = input("provide url to check: ")
+	html = log.get_raw_html(url)
+
+	print(f"page has CAPTCHA: {log.has_captcha(html)}")
+	print(f"page has login form: {log.has_login_form(html)}")
