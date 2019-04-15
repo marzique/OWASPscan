@@ -5,15 +5,11 @@ from configer import Configer
 from loginer import Loginer
 
 
-def start_configer(mode=None, url=None):
-    if not mode or not url:
-        print('url or mode not privided')
+def start_configer(settings, url=None):
+    if not settings or not url:
+        print('url or settings not privided')
         sys.exit(1)
-    if mode == 'local':
-        local = True
-    elif mode == 'enterprise':
-        local = False
-    c = Configer(url, local=local)
+    c = Configer(url, settings)
     c.output_configuration()
     return c
 

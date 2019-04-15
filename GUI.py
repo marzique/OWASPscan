@@ -5,17 +5,20 @@ import os
 from application import start_configer, start_loginer
 
 
+settings = {"local": False,
+            "page_limit": None,
+            }
+
 def execute():
-    mode = None
     url = url_field.get()
     if not url:
         provide_url()
         return
-    if r_var.get() == '--enterprise':
-        mode = 'enterprise'
-    elif r_var.get() == '--local':
-        mode = 'local'
-    c = start_configer(mode=mode, url=url)
+    if r_var.get() == "--enterprise":
+        settings["local"] = False
+    elif r_var.get() == "--local":
+        settings["local"] = True
+    c = start_configer(settings, url=url)
     start_loginer(c)
     sys.exit(1)
 
@@ -26,10 +29,10 @@ def donothing():
     button.pack()
 
 def provide_url():
-    messagebox.showinfo('Error', 'Please provide target URL!')
+    messagebox.showinfo("Error", "Please provide target URL!")
 
 tk = Tk()
-tk.title('OWASPscan')
+tk.title("OWASPscan")
 tk.minsize(600, 400)
 
 menubar = Menu(tk)
@@ -68,10 +71,10 @@ url_field.grid(row = 0, column = 1, sticky = W)
 
 r_var = StringVar()
 
-r_var.set('--enterprise')
+r_var.set("--enterprise")
 
-Radiobutton(tk, text='localhost', variable=r_var, value='--local').grid(row = 1, column = 0, sticky = W)
-Radiobutton(tk, text='enterprise', variable=r_var, value='--enterprise').grid(row = 1, column = 1, sticky = W)
+Radiobutton(tk, text="localhost", variable=r_var, value="--local").grid(row = 1, column = 0, sticky = W)
+Radiobutton(tk, text="enterprise", variable=r_var, value="--enterprise").grid(row = 1, column = 1, sticky = W)
 
 Button(tk, text = "Begin scan", command = execute, bg="green", fg="white").grid(row = 5, sticky = W)
 
