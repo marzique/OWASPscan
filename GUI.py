@@ -19,7 +19,7 @@ def execute():
     elif r_var.get() == "--local":
         settings["local"] = True
     c = start_configer(settings, url=url)
-    start_loginer(c)
+    l = start_loginer(c)
     sys.exit(1)
 
 def donothing():
@@ -30,6 +30,14 @@ def donothing():
 
 def provide_url():
     messagebox.showinfo("Error", "Please provide target URL!")
+
+def toggle_pagelimit():
+    if not page_limit.get():
+        limit.grid_remove()
+        limitlabel.grid_remove()
+    else:
+        limit.grid(row = 4, column = 1, sticky = W)
+        limitlabel.grid(row = 4)
 
 tk = Tk()
 tk.title("OWASPscan")
@@ -65,22 +73,31 @@ helpmenu.add_command(label="Help Index", command=donothing)
 helpmenu.add_command(label="About...", command=donothing)
 menubar.add_cascade(label="Help", menu=helpmenu)
 
+# URL
 Label(tk, text = "Target URL:").grid(row = 0)
 url_field = Entry(tk)
 url_field.grid(row = 0, column = 1, sticky = W)
 
 r_var = StringVar()
-
 r_var.set("--enterprise")
 
-Radiobutton(tk, text="localhost", variable=r_var, value="--local").grid(row = 1, column = 0, sticky = W)
-Radiobutton(tk, text="enterprise", variable=r_var, value="--enterprise").grid(row = 1, column = 1, sticky = W)
+# Server type
+Label(tk, text = "Server:").grid(row = 1, column = 0)
+Radiobutton(tk, text="localhost", variable=r_var, value="--local").grid(row = 1, column = 1, sticky = W)
+Radiobutton(tk, text="enterprise", variable=r_var, value="--enterprise").grid(row = 2, column = 1, sticky = W)
 
-Button(tk, text = "Begin scan", command = execute, bg="green", fg="white").grid(row = 5, sticky = W)
+# Page search limit
+Label(tk, text = "limit pages?").grid(row = 3, column = 0)
+page_limit = IntVar()
+Checkbutton(tk, variable=page_limit, command=toggle_pagelimit).grid(row=3, column = 1, sticky=W)
+limitlabel = Label(tk, text = "Page search limit:")
+limit = Entry(tk)
 
-copyright = "OWASPscan 2019"
-label2 = Label(text=copyright, justify=LEFT, fg="grey")
-label2.place(relx=0, rely=0.96)
+# Search button
+Button(tk, text = "Begin scan", command = execute, bg="green", fg="white").grid(row = 5, column = 1, sticky = W)
+
+label2 = Label(text="Tarnavskyi Denys, 2019", justify=LEFT, fg="grey")
+label2.place(relx=0, rely=0.95)
 
 tk.config(menu=menubar)
 tk.mainloop()

@@ -6,6 +6,7 @@ from loginer import Loginer
 
 
 def start_configer(settings, url=None):
+    # do we need this double check? TODO
     if not settings or not url:
         print('url or settings not privided')
         sys.exit(1)
@@ -16,6 +17,7 @@ def start_configer(settings, url=None):
 def start_loginer(c):
     l = Loginer(c)
     l.start_hack()
+    return l
 
 
 if __name__ == "__main__":
