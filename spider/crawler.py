@@ -17,7 +17,7 @@ class Crawler:
 		self.found_links = []
 		self.error_links = []
 		self.redirect_links=[]
-		self.visited_links = [self.url]
+		self.visited_links = []
 		self.limit = limit
 
 	def start(self):
@@ -91,7 +91,7 @@ class Crawler:
 				if self.limit:
 					if len(self.visited_links) >= self.limit:
 						break
-						
+
 				link = remove_parameters(link)
 				if link not in self.visited_links and self.same_domain(link) and len(link) <= 250: # fix this!
 					link = self.normalize(link)
