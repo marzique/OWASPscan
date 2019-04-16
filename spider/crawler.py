@@ -8,7 +8,7 @@ from helpers.helpers import strip_url, remove_parameters
 
 class Crawler:
 	"""Crawl website and find all pages from links"""
-	def __init__(self, url, exclude=None, domain=None, no_verbose=False):
+	def __init__(self, url, exclude=None, domain=None, no_verbose=False, limit=None):
 		self.url = self.normalize(url)
 		self.host = urlparse(self.url).netloc
 		self.domain = domain
@@ -18,6 +18,7 @@ class Crawler:
 		self.error_links = []
 		self.redirect_links=[]
 		self.visited_links = [self.url]
+		self.limit = limit
 
 	def start(self):
 		self.crawl(self.url)
@@ -87,6 +88,10 @@ class Crawler:
 						self.add_url(link, links, self.exclude)
 
 			for link in links:
+				if self.limit:
+					if len(self.visited_links) >= self.limit:
+						break
+						
 				link = remove_parameters(link)
 				if link not in self.visited_links and self.same_domain(link) and len(link) <= 250: # fix this!
 					link = self.normalize(link)

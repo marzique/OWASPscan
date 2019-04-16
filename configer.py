@@ -29,9 +29,7 @@ class Configer:
         self.certificate = check_site(self.url)
         self.pages = []
         self.adminpages = []
-        # print(getSimple(self.url))
-        # print(getDetail(self.url))
-        print(self.r.headers)
+        self.pagelimit = settings["page_limit"]
 
     def get_headers(self):
         """Get headers from request and handle possible errors"""
@@ -145,6 +143,6 @@ class Configer:
 
     def get_pages(self, url, no_verbose=False):
         """Return list of all webpages"""
-        crawler = Crawler(url, no_verbose)
+        crawler = Crawler(url, no_verbose, limit=self.pagelimit)
         return crawler.start()
         

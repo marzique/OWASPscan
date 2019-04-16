@@ -14,6 +14,13 @@ def execute():
     if not url:
         provide_url()
         return
+
+    try:
+        lim = int(limit.get())
+        settings["page_limit"] = lim
+    except:
+        pass
+
     if r_var.get() == "--enterprise":
         settings["local"] = False
     elif r_var.get() == "--local":
@@ -36,8 +43,8 @@ def toggle_pagelimit():
         limit.grid_remove()
         limitlabel.grid_remove()
     else:
-        limit.grid(row = 4, column = 1, sticky = W)
-        limitlabel.grid(row = 4)
+        limit.grid(row = 4, column = 1, sticky=E)
+        limitlabel.grid(row = 4, sticky=E)
 
 tk = Tk()
 tk.title("OWASPscan")
@@ -74,7 +81,7 @@ helpmenu.add_command(label="About...", command=donothing)
 menubar.add_cascade(label="Help", menu=helpmenu)
 
 # URL
-Label(tk, text = "Target URL:").grid(row = 0)
+Label(tk, text = "Target URL:", width=15).grid(row = 0, sticky=E)
 url_field = Entry(tk)
 url_field.grid(row = 0, column = 1, sticky = W)
 
@@ -82,12 +89,12 @@ r_var = StringVar()
 r_var.set("--enterprise")
 
 # Server type
-Label(tk, text = "Server:").grid(row = 1, column = 0)
+Label(tk, text = "Server:").grid(row = 1, column = 0, sticky=E)
 Radiobutton(tk, text="localhost", variable=r_var, value="--local").grid(row = 1, column = 1, sticky = W)
 Radiobutton(tk, text="enterprise", variable=r_var, value="--enterprise").grid(row = 2, column = 1, sticky = W)
 
 # Page search limit
-Label(tk, text = "limit pages?").grid(row = 3, column = 0)
+Label(tk, text = "limit pages?").grid(row = 3, column = 0, sticky=E)
 page_limit = IntVar()
 Checkbutton(tk, variable=page_limit, command=toggle_pagelimit).grid(row=3, column = 1, sticky=W)
 limitlabel = Label(tk, text = "Page search limit:")
