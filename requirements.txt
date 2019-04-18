@@ -1,5 +1,6 @@
+loginform==1.2.0
+httplib2==0.12.1
 requests==2.20.0
 tqdm==4.31.1
-httplib2==0.12.1
 pyOpenSSL==19.0.0
 beautifulsoup4==4.7.1

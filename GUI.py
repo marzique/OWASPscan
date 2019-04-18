@@ -3,6 +3,10 @@ from tkinter import *
 from tkinter import messagebox
 import os
 from application import start_configer, start_loginer
+import time
+
+
+
 
 
 settings = {"local": False,
@@ -10,6 +14,8 @@ settings = {"local": False,
             }
 
 def execute():
+    start = time.time()
+
     url = url_field.get()
     if not url:
         provide_url()
@@ -27,6 +33,9 @@ def execute():
         settings["local"] = True
     c = start_configer(settings, url=url)
     l = start_loginer(c)
+
+    time_minutes = (start - time.time()) / 60
+    print(f"OWASPscan took {time_minutes} minutes")
     sys.exit(1)
 
 def donothing():
