@@ -34,7 +34,7 @@ def execute():
     c = start_configer(settings, url=url)
     l = start_loginer(c)
 
-    time_minutes = (start - time.time()) / 60
+    time_minutes = (time.time() - start) / 60
     print(f"OWASPscan took {time_minutes} minutes")
     sys.exit(1)
 

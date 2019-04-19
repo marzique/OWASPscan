@@ -37,7 +37,6 @@ class Loginer:
 		"""Return HTML page from url"""
 		try:
 			res = requests.get(url)
-			print(res.text)
 		except:
 			return None
 
