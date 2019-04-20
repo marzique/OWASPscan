@@ -21,16 +21,17 @@
 	- find out best python way to check it
 
 ## AUTHENTIFICATOR:
-- try to bruteforce pages - can we or not
+- ~try to bruteforce pages - can we or not~
 - check vocabulary attack
-- check for CAPTCHA
+- ~check for CAPTCHA~
 - 
 
 ## CVE
 - check folder via API
 
 ## CONFIGER
-- check for more sensitive info possible
+- check for more sensitive info possible via URL
+- check folder!
 ------------
 
 ### Output
