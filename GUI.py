@@ -6,11 +6,9 @@ from application import start_configer, start_loginer
 import time
 
 
-
-
-
 settings = {"local": False,
             "page_limit": None,
+            "vocabulary": False,
             }
 
 def execute():
@@ -34,7 +32,7 @@ def execute():
     c = start_configer(settings, url=url)
     l = start_loginer(c)
 
-    time_minutes = (time.time() - start) / 60
+    time_minutes = str((time.time() - start) / 60)[:4]
     print(f"OWASPscan took {time_minutes} minutes")
     sys.exit(1)
 

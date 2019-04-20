@@ -16,6 +16,7 @@ class Configer:
     """Get all possible info about app configuration from it's URL"""
     def __init__(self, url, settings):
         self.url = url
+        self.settings = settings
         self.local = settings['local']                   # check if development mode
         self.r = self.get_headers()          # http request header
         self.detected = getSimple(self.url)  # web-app confifuration
