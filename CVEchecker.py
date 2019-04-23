@@ -7,9 +7,7 @@ Java
 JavaScript (?)
 """
 from safety_db import INSECURE
-
-# https://raw.githubusercontent.com/pyupio/safety-db/master/data/insecure.json
-# https://raw.githubusercontent.com/pyupio/safety-db/master/data/insecure_full.json
+import requests
 
 
 class CVEchecker:
@@ -23,7 +21,27 @@ class CVEchecker:
 
 	def detect_language(self, file):
 		""""""
-			
+		pass
+
+def refresh_python_dependencies():
+	""""""
+	insecure = requests.get("https://raw.githubusercontent.com/pyupio/safety-db/master/data/insecure.json")
+	with open('data/insecure.json','r+') as f:
+		#convert to string:
+		data = f.read()
+		f.seek(0)
+		f.write(insecure.text)
+		f.truncate()
+	
+	insecure_full = requests.get("https://raw.githubusercontent.com/pyupio/safety-db/master/data/insecure_full.json")
+	with open('data/insecure_full.json','r+') as f:
+		#convert to string:
+		data = f.read()
+		f.seek(0)
+		f.write(insecure.text)
+		f.truncate()
+
 
 if __name__ == "__main__":
-	print(INSECURE["flask"])
+	refresh_python_dependencies()
+	# print(INSECURE["flask"])
