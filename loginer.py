@@ -18,10 +18,10 @@ class Loginer:
 		self.filtered_pages = []
 		self.passwords = open('assets/passwords.txt').readlines()
 		self.users = open('assets/users.txt').readlines()
+		self.vocabulary = False
 
 		# refactor this retarted way of passing True or False TODO!
 		# self.vocabulary = configer.settings["vocabulary"] 
-		print(configer.settings)
 		# TODO
 
 	def start_hack(self):
