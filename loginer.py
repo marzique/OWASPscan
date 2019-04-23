@@ -19,6 +19,7 @@ class Loginer:
 		self.passwords = open('assets/passwords.txt').readlines()
 		self.users = open('assets/users.txt').readlines()
 		self.vocabulary = False
+		self.gap = 100 # max difference between pages to be considered almots the same
 
 		# refactor this retarted way of passing True or False TODO!
 		# self.vocabulary = configer.settings["vocabulary"] 
@@ -91,72 +92,85 @@ class Loginer:
 		return login_pages
 
 	def bruteforce_url(self, url, limit):
-		""""""
-		attempts = 0
-		# get html of the page and retreive POST DATA (login, password fields, hidden fields, post url)
-		for user in self.users:
-			user = user.replace('\n', '')
-			average = 0
-			for password in self.passwords:
-				password = password.replace('\n', '')
-				# Return login, password and other input.names + target url + method
-				r = requests.get(url)
-				try:
-					fillings = fill_login_form(url, r.text, user.replace('\n', ''), password.replace('\n', ''))
-				except:
-					print(bcolors.WARNING + "Can't fill form, skipping page" + bcolors.OKGREEN)
-					return
+		"""Submit login form for every user/password combination count total attempts. 
+		Successful attempt is the one which return different html from previous ones.
+		"""
 
-				# print(f"trying {user}: {password}", end='')
-				payload = dict(fillings[:-2][0])
-				post_url = fillings[-2:-1][0]
-				method = fillings[-1:][0]
+		attempts = 0 
+		# for user in self.users:
+		# 	user = user.replace('\n', '')
+		user = "admin"
+		average = 0
+		for password in self.passwords:
+			password = password.replace('\n', '')
+			# Return login, password and other input.names + target url + method
+			r = requests.get(url)
+			try:
+				fillings = fill_login_form(url, r.text, user.replace('\n', ''), password.replace('\n', ''))
+			except:
+				print(bcolors.FAIL + f"Bruteforce attack not allowed : {url}" + bcolors.OKGREEN)
+				return False
 
-				if method == "POST":
-					with requests.Session() as s:
-						# get cookie for successful POST request
-						res = requests.get(url)
-						cookies = dict(res.cookies)
-						p = s.post(post_url, data=payload, cookies=cookies)
+			print(bcolors.OKGREEN + f"    trying {user}: {password}")
+			payload = dict(fillings[:-2][0]) # parameters for  request
+			post_url = fillings[-2:-1][0]
+			method = fillings[-1:][0] 		 # POST/GET
 
-						if not average:
-							average = len(p.text)
-						elif abs(average - len(p.text)) >= 100:
-							print(bcolors.CYAN + "   login successful!" + bcolors.OKGREEN)
-					attempts += 1
+			if method == "POST":
+				with requests.Session() as s:
+					# get cookie for successful POST request
+					res = requests.get(url)
+					cookies = dict(res.cookies)
+					p = s.post(post_url, data=payload, cookies=cookies)
 
-				elif method == "GET":
-					with requests.Session() as s:
-						res = requests.get(post_url, params=payload)
-						if not average:
-							average = len(res.text)
-						elif abs(average - len(res.text)) >= 100:
-							print(bcolors.CYAN + "    login successful!" + bcolors.OKGREEN)
-					attempts += 1
+					if not average:
+						average = len(p.text)
+					elif len(p.text) - average > self.gap: 
+						# we probably have error as page size increased
+						print(bcolors.FAIL + f"Bruteforce attack not allowed : {url}" + bcolors.OKGREEN)
+						return False
+				attempts += 1
 
-				else:
-					# super edge case
-					print(bcolors.WARNING + 'No method found in form, skipping page' + bcolors.OKGREEN)
-					return
+			elif method == "GET":
+				with requests.Session() as s:
+					res = requests.get(post_url, params=payload)
+					if not average:
+						average = len(res.text)
+					elif len(p.text) - average > self.gap:
+						# we probably have error as page size increased
+						print(bcolors.FAIL + f"Bruteforce attack not allowed : {url}" + bcolors.OKGREEN)
+						return False
+					elif res.status_code != 200:
+						print(bcolors.FAIL + f"Bruteforce attack not allowed : {url}" + bcolors.OKGREEN)
+						return False
+				attempts += 1
+
+			else:
+				# super edge case
+				print(bcolors.WARNING + 'No method found in form, skipping page' + bcolors.OKGREEN)
+				return
 		if attempts > limit:
 			print(bcolors.CYAN + f"Bruteforce possible! page: {url}" + bcolors.OKGREEN)
-			return False
+			return attempts
 		else:
 			print(bcolors.FAIL + f"Bruteforce attack not allowed : {url}" + bcolors.OKGREEN)
-			return attempts
+			return False
 
 
 	def bruteforce_attack(self, page_urls):
 		stats = {}
 		for page in page_urls:
+			print(bcolors.OKGREEN + page)
 			attempts = self.bruteforce_url(page, 10)
 			if attempts:
-				stats["page"] = attempts
+				stats[page] = attempts
 		if stats:
-			print(bcolors.OKGREEN + f"Pages where bruteforce possible:")
+			print(bcolors.CYAN + f"Bruteforce possible on pages:")
 			for page in stats:
 				if stats[page]:
 					print(bcolors.CYAN + page + bcolors.OKGREEN)
+		else:
+			print(bcolors.OKGREEN + f"No bruteforce vulnurable pages found!")
 
 
 
