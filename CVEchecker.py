@@ -1,5 +1,15 @@
-"""Check given folder/repository for common vulnurabilities using CVE online DB"""
-from linguist.libs.file_blob import FileBlob
+"""
+PHP
+Python
+C#
+Ruby
+Java
+JavaScript (?)
+"""
+from safety_db import INSECURE
+
+# https://raw.githubusercontent.com/pyupio/safety-db/master/data/insecure.json
+# https://raw.githubusercontent.com/pyupio/safety-db/master/data/insecure_full.json
 
 
 class CVEchecker:
@@ -13,9 +23,7 @@ class CVEchecker:
 
 	def detect_language(self, file):
 		""""""
-		FileBlob(file).language.name
 			
 
 if __name__ == "__main__":
-	cve = CVEchecker('kek')
-	cve.detect_language('loginer.py')
+	print(INSECURE["flask"])
