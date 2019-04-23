@@ -1,11 +1,4 @@
-"""
-PHP
-Python
-C#
-Ruby
-Java
-JavaScript (?)
-"""
+"""PHP, Python, C#, Ruby, Java, JavaScript (?)"""
 from safety_db import INSECURE
 import requests
 
@@ -23,8 +16,9 @@ class CVEchecker:
 		""""""
 		pass
 
+
 def refresh_python_dependencies():
-	""""""
+	"""Download and refresh insecure.json and insecure_full.json"""
 	insecure = requests.get("https://raw.githubusercontent.com/pyupio/safety-db/master/data/insecure.json")
 	with open('data/insecure.json','r+') as f:
 		#convert to string:
@@ -43,5 +37,4 @@ def refresh_python_dependencies():
 
 
 if __name__ == "__main__":
-	refresh_python_dependencies()
-	# print(INSECURE["flask"])
+	print(INSECURE["requests"])
