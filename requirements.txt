@@ -1,6 +1,8 @@
-loginform==1.2.0
-httplib2==0.12.1
 requests==2.20.0
+httplib2==0.12.1
 tqdm==4.31.1
+loginform==1.2.0
+Flask==1.0.2
 pyOpenSSL==19.0.0
 beautifulsoup4==4.7.1
+safety_db==2018.7.24
