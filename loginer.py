@@ -29,7 +29,7 @@ class Loginer:
 		print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
 		print(bcolors.OKGREEN + "--------------------------Loginer scan search------------------------------")
 		print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
-		self.filter_pages(self.adminpages)
+		self.filtered_pages = self.filter_pages(self.adminpages)
 		print(bcolors.OKGREEN + "Bruteforce check:")
 		self.bruteforce_attack(self.filtered_pages)
 		if self.vocabulary:
@@ -188,4 +188,5 @@ if __name__ == "__main__":
 	c = Configer("https://inmac.org/login/", settings)
 	log = Loginer(c)
 	
-	log.bruteforce_attack(['https://id.bigmir.net/', 'http://leafus.com.ua/wp-admin', 'https://www.ukr.net/'])
+	# log.bruteforce_attack(['https://id.bigmir.net/', 'http://leafus.com.ua/wp-admin', 'https://www.ukr.net/'])
+	log.bruteforce_attack(['http://leafus.com.ua/wp-admin'])
