@@ -107,3 +107,5 @@ sqlmap-dev
 /sqlmap-dev
 sqlmap-dev/
 /sqlmap-dev/
+
+vulnurable_reqs.txt
