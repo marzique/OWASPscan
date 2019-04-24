@@ -5,6 +5,7 @@ from safety_db import INSECURE
 import requests
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
+from helpers.colors import bcolors
 
 
 def check_github_url(self, string):
@@ -33,33 +34,29 @@ def refresh_python_dependencies():
 		f.write(insecure.text)
 		f.truncate()
 
-def check_python_dependencies(dependencies):
+def check_python_dependencies(path_to_requirements):
 	"""TODO"""
+
+	fo = open(path_to_requirements, "r")
+	dependencies = fo.read().splitlines()
 	vulnurable = []
 	for dependency in dependencies:
 		library, version = dependency.split("==")
 		try:
 			vers = INSECURE[library]
-			# print(f"{library} has vulnurable versions: {vers}")
-			# TODO
 		except KeyError:
-			print(f"No vulnurabilites found in database for {library}")
+			print(bcolors.OKGREEN + f"No vulnurabilites found for {library}")
 			continue
 
 		ver = Version(version)
 		for specifier in vers:
 			if ver in SpecifierSet(specifier):
-				print(f"we have bad dependency {dependency}")
+				print(bcolors.FAIL + f"Vulnurable dependency version for  {dependency}" + bcolors.OKGREEN)
 				vulnurable.append(dependency)
-	print("bad dependencies:")
-	print(vulnurable)
 
-
-
-
+	return vulnurable
 
 
 if __name__ == "__main__":
-	fo = open("requirements.1.txt", "r")
-	check_python_dependencies(fo.read().splitlines())
-	# check_python_dependencies(["bs4", "flask", "tqdm"])
+		
+	check_python_dependencies("requirements.1.txt")
