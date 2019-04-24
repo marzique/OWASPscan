@@ -22,7 +22,7 @@ class Configer:
         self.detected = getSimple(self.url)  # web-app confifuration
         self.cookie = self.get_cookie()
         self.date = self.get_date()
-        self.encoding = bcolors.CYAN + self.r.encoding
+        self.encoding = bcolors.WARNING + self.r.encoding
         self.server = self.get_server()
         self.compression = self.get_compression()
         self.os = self.get_os()
@@ -54,7 +54,7 @@ class Configer:
 
     def get_compression(self):
         try:
-            return bcolors.CYAN + self.r.headers['Content-Encoding'] + bcolors.RESET
+            return bcolors.OKGREEN + self.r.headers['Content-Encoding'] + bcolors.RESET
         except:
             return bcolors.FAIL + "hidden"
 
@@ -62,9 +62,9 @@ class Configer:
     def get_date(self):
         """Return current GMT from response header or generate it  manually"""
         try:
-            return bcolors.CYAN + self.r.headers['Date'] + bcolors.RESET
+            return bcolors.OKGREEN + self.r.headers['Date']
         except:
-            return bcolors.CYAN + strftime("%a, %d %b %Y %X GMT", gmtime()) + bcolors.RESET
+            return bcolors.OKGREEN + strftime("%a, %d %b %Y %X GMT", gmtime())
 
 
     def output_configuration(self):
@@ -108,38 +108,38 @@ class Configer:
         highlight 'proxy-like' server name with orange
         """
         try:
-            return bcolors.CYAN + self.detected['web-servers'] + bcolors.RESET
+            return bcolors.FAIL + self.detected['web-servers'] + bcolors.RESET
         except:
             try:
                 return bcolors.WARNING + self.r.headers['Server'] + bcolors.RESET
             except:
-                return bcolors.FAIL + 'hidden'
+                return bcolors.CYAN + 'hidden' + bcolors.RESET
 
 
     def get_os(self):
         if not self.local:
             try:
-                return bcolors.CYAN + self.detected['operating-systems'] + bcolors.RESET
+                return bcolors.FAIL + self.detected['operating-systems'] + bcolors.RESET
             except:
-                return bcolors.FAIL + 'hidden'
+                return bcolors.CYAN + 'hidden' + bcolors.RESET
         else:
             return bcolors.WANING + platform.platform() + bcolors.RESET + bcolors.HEADER + ' [CURRENT PC]' + bcolors.RESET
 
 
     def get_cookie(self):
         try:
-            return bcolors.CYAN + self.r.headers['Set-Cookie'] + bcolors.RESET
+            return bcolors.FAIL + self.r.headers['Set-Cookie'] + bcolors.RESET
         except KeyError:
-            return bcolors.FAIL + "hidden" + bcolors.RESET
+            return bcolors.CYAN + "hidden" + bcolors.RESET
 
 
     def get_language(self):
         """Try to get programming language from header"""
         try:
-            return bcolors.CYAN + self.detected['programming-languages'] + bcolors.RESET
+            return bcolors.FAIL + self.detected['programming-languages'] + bcolors.RESET
         except:
             # TODO: https://www.owasp.org/index.php/Testing_for_HTTP_Parameter_pollution_(OTG-INPVAL-004)
-            return bcolors.FAIL + 'hidden' + bcolors.RESET
+            return bcolors.CYAN + 'hidden' + bcolors.RESET
 
 
     def get_pages(self, url, no_verbose=False):

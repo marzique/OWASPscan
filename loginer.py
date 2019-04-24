@@ -30,7 +30,7 @@ class Loginer:
 		print(bcolors.OKGREEN + "--------------------------Loginer scan search------------------------------")
 		print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
 		self.filter_pages(self.adminpages)
-		print(bcolors.OKGREEN + "---------------------------Bruteforce check--------------------------------")
+		print(bcolors.OKGREEN + "Bruteforce check:")
 		self.bruteforce_attack(self.filtered_pages)
 		if self.vocabulary:
 			print(bcolors.OKGREEN + "---------------------------Vocabulary attack-------------------------------")
@@ -86,9 +86,9 @@ class Loginer:
 						login_pages.append(page)
 						print(bcolors.CYAN + f"{page} has login form!")
 				else:
-					print(bcolors.WANING + f"{page} has CAPTCHA, ignoring")
+					print(bcolors.WARNING + f"{page} has CAPTCHA, ignoring")
 			else:
-				print(bcolors.FAIL + f"can't parse HTML from: {page}")
+				print(bcolors.OKGREEN + f"can't parse HTML from: {page}")
 		return login_pages
 
 	def bruteforce_url(self, url, limit):
@@ -108,7 +108,7 @@ class Loginer:
 			try:
 				fillings = fill_login_form(url, r.text, user.replace('\n', ''), password.replace('\n', ''))
 			except:
-				print(bcolors.FAIL + f"Bruteforce attack not allowed : {url}" + bcolors.OKGREEN)
+				print(bcolors.CYAN + f"Bruteforce attack not allowed : {url}" + bcolors.OKGREEN)
 				return False
 
 			print(bcolors.OKGREEN + f"    trying {user}: {password}")
@@ -127,7 +127,7 @@ class Loginer:
 						average = len(p.text)
 					elif len(p.text) - average > self.gap: 
 						# we probably have error as page size increased
-						print(bcolors.FAIL + f"Bruteforce attack not allowed : {url}" + bcolors.OKGREEN)
+						print(bcolors.CYAN + f"Bruteforce attack not allowed : {url}" + bcolors.OKGREEN)
 						return False
 				attempts += 1
 
@@ -138,10 +138,10 @@ class Loginer:
 						average = len(res.text)
 					elif len(p.text) - average > self.gap:
 						# we probably have error as page size increased
-						print(bcolors.FAIL + f"Bruteforce attack not allowed : {url}" + bcolors.OKGREEN)
+						print(bcolors.CYAN + f"Bruteforce attack not allowed : {url}" + bcolors.OKGREEN)
 						return False
 					elif res.status_code != 200:
-						print(bcolors.FAIL + f"Bruteforce attack not allowed : {url}" + bcolors.OKGREEN)
+						print(bcolors.CYAN + f"Bruteforce attack not allowed : {url}" + bcolors.OKGREEN)
 						return False
 				attempts += 1
 
@@ -150,10 +150,10 @@ class Loginer:
 				print(bcolors.WARNING + 'No method found in form, skipping page' + bcolors.OKGREEN)
 				return
 		if attempts > limit:
-			print(bcolors.CYAN + f"Bruteforce possible! page: {url}" + bcolors.OKGREEN)
+			print(bcolors.FAIL + f"Bruteforce possible! page: {url}" + bcolors.OKGREEN)
 			return attempts
 		else:
-			print(bcolors.FAIL + f"Bruteforce attack not allowed : {url}" + bcolors.OKGREEN)
+			print(bcolors.CYAN + f"Bruteforce attack not allowed : {url}" + bcolors.OKGREEN)
 			return False
 
 
@@ -165,12 +165,12 @@ class Loginer:
 			if attempts:
 				stats[page] = attempts
 		if stats:
-			print(bcolors.CYAN + f"Bruteforce possible on pages:")
+			print(bcolors.FAIL + f"Bruteforce possible on pages:")
 			for page in stats:
 				if stats[page]:
-					print(bcolors.CYAN + page + bcolors.OKGREEN)
+					print(bcolors.FAIL + page + bcolors.OKGREEN)
 		else:
-			print(bcolors.OKGREEN + f"No bruteforce vulnurable pages found!")
+			print(bcolors.CYAN + f"No bruteforce vulnurable pages found!")
 
 
 
