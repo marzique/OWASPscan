@@ -8,6 +8,7 @@ from packaging.version import Version
 from helpers.colors import bcolors
 import os
 import glob
+import requests
 
 def get_list_of_files(dir_name, extensions=None):
     """Return list of all source code files within given directory and subdirectories"""
@@ -73,12 +74,13 @@ def refresh_python_dependencies():
         #convert to string:
         data = f.read()
         f.seek(0)
-        f.write(insecure.text)
+        f.write(insecure_full.text)
         f.truncate()
 
 def check_python_dependencies(path_to_requirements):
     """Check requirements.txt for vulnurable dependencies,
-    return them"""
+    return them
+    """
 
     vulnurable = []
     fo = open(path_to_requirements, "r")
@@ -103,8 +105,58 @@ def check_python_dependencies(path_to_requirements):
     return vulnurable
 
 
-if __name__ == "__main__":
-    path = os.getcwd()
-    print(detect_language(get_list_of_files(path)))
+def check_php_dependencies(path_to_composer_dot_lock):
+    """Check composer.lock file for vulnurable dependencies,
+    return them
+    """
+    # https://github.com/FriendsOfPHP/security-advisories - THANKS FOR API (fuck you for limit)!
+    #  curl -H "Accept: application/json" https://security.symfony.com/check_lock -F lock=@/path/to/composer.lock
 
-    # check_python_dependencies("vulnurable_reqs.txt")
+    vulnurable = []
+
+    # request to API stuff
+    headers = {'Accept': 'application/json',}
+    files = {'lock': (path_to_composer_dot_lock, open(path_to_composer_dot_lock, 'rb')),}
+    json_response = requests.post('https://security.symfony.com/check_lock', headers=headers, files=files).json()
+
+    if isinstance(json_response, dict):
+        print(bcolors.WARNING + f"Request limit for API exceeded!" + bcolors.OKGREEN)
+        return None
+
+    elif json_response:
+        for k in json_response:
+            ver = json_response[k]["version"]
+            print(bcolors.FAIL + f"Vulnurable dependency version found  {k}=={ver}" + bcolors.OKGREEN)
+            vulnurable.append(f"{k}=={ver}")
+    else:
+        print(bcolors.OKGREEN + f"No vulnurabilites found")
+
+    return vulnurable
+    
+
+def check_csharp_dependencies():
+    pass
+
+def check_ruby_dependencies():
+    pass
+
+def check_java_dependencies():
+    pass
+
+if __name__ == "__main__":
+    # path = os.getcwd()
+    # print(detect_language(get_list_of_files(path)))
+
+    # pyvul = check_python_dependencies("tests/vulnurable_reqs.txt")
+    # print(pyvul)
+
+
+    print(check_php_dependencies("tests/composer.lock"))
+
+
+    # import json
+    # json_str = '{"symfony/dependency-injection":{"version":"v4.2.3","advisories":[{"title":"CVE-2019-10910: Check service IDs are valid","link":"https://symfony.com/cve-2019-10910","cve":"CVE-2019-10910"}]},"symfony/http-foundation":{"version":"v4.2.3","advisories":[{"title":"CVE-2019-10913: Reject invalid HTTP method overrides","link":"https://symfony.com/cve-2019-10913","cve":"CVE-2019-10913"}]},"twig/twig":{"version":"v2.6.2","advisories":[{"title":"Sandbox Information Disclosure","link":"https://symfony.com/blog/twig-sandbox-information-disclosure","cve":""}]}}'
+    # json_dict = json.loads(json_str)
+    # for k in json_dict:
+    #     ver = json_dict[k]["version"]
+    #     print(f"{k}=={ver}")
