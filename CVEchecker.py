@@ -117,9 +117,14 @@ def check_php_dependencies(path_to_composer_dot_lock):
     # request to API stuff
     headers = {'Accept': 'application/json',}
     files = {'lock': (path_to_composer_dot_lock, open(path_to_composer_dot_lock, 'rb')),}
-    json_response = requests.post('https://security.symfony.com/check_lock', headers=headers, files=files).json()
 
-    if isinstance(json_response, dict):
+    try:
+        json_response = requests.post('https://security.symfony.com/check_lock', headers=headers, files=files).json()
+    except:
+        print(bcolors.WARNING + f"Request limit for API exceeded!" + bcolors.OKGREEN)
+        return None
+
+    if not isinstance(json_response, dict) or json_response["error"]:
         print(bcolors.WARNING + f"Request limit for API exceeded!" + bcolors.OKGREEN)
         return None
 
@@ -132,7 +137,7 @@ def check_php_dependencies(path_to_composer_dot_lock):
         print(bcolors.OKGREEN + f"No vulnurabilites found")
 
     return vulnurable
-    
+
 
 def check_csharp_dependencies():
     pass
