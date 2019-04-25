@@ -123,8 +123,8 @@ def check_php_dependencies(path_to_composer_dot_lock):
     except:
         print(bcolors.WARNING + f"Request limit for API exceeded!" + bcolors.OKGREEN)
         return None
-
-    if not isinstance(json_response, dict) or json_response["error"]:
+    print(json_response)
+    if not isinstance(json_response, dict) or "error" in json_response:
         print(bcolors.WARNING + f"Request limit for API exceeded!" + bcolors.OKGREEN)
         return None
 
