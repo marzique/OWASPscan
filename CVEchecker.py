@@ -1,4 +1,4 @@
-"""PHP, Python, C#, Ruby, Java, JavaScript (?)
+"""~PHP~, ~Python~, C#, Ruby, Java, JavaScript (?)
 https://github.com/pyupio/safety-db
 """
 from safety_db import INSECURE
@@ -6,9 +6,24 @@ import requests
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
 from helpers.colors import bcolors
+from tqdm import tqdm
+from bs4 import BeautifulSoup
 import os
 import glob
 import requests
+
+
+def get_list_of_proxies():
+    """Return list of parsed IPs from free proxy website"""
+
+    proxies = []
+    res = requests.get('https://free-proxy-list.net/', headers={'User-Agent':'Mozilla/5.0'})
+    soup = BeautifulSoup(res.text,"lxml")
+    for items in tqdm(soup.select("tbody tr")):
+        proxy_address = ':'.join([item.text for item in items.select("td")[:2]])
+        # print(proxy_address)
+        proxies.append(proxy_address)
+    return proxies
 
 def get_list_of_files(dir_name, extensions=None):
     """Return list of all source code files within given directory and subdirectories"""
@@ -123,7 +138,7 @@ def check_php_dependencies(path_to_composer_dot_lock):
     except:
         print(bcolors.WARNING + f"Request limit for API exceeded!" + bcolors.OKGREEN)
         return None
-    print(json_response)
+
     if not isinstance(json_response, dict) or "error" in json_response:
         print(bcolors.WARNING + f"Request limit for API exceeded!" + bcolors.OKGREEN)
         return None
@@ -149,19 +164,35 @@ def check_java_dependencies():
     pass
 
 if __name__ == "__main__":
+    # DETECT LANG OF FOLDER
     # path = os.getcwd()
     # print(detect_language(get_list_of_files(path)))
 
+    # DETECT VULNURABILITIES IN REQ.TXT [PYTHON]
     # pyvul = check_python_dependencies("tests/vulnurable_reqs.txt")
     # print(pyvul)
 
+    # DETECT VULN IN COMPOSER.LOCK [PHP]
+    # print(check_php_dependencies("tests/composer.lock"))
 
-    print(check_php_dependencies("tests/composer.lock"))
+    # list of proxies
+    # get_list_of_proxies()
 
+    from itertools import cycle
+    import traceback
+    #If you are copy pasting proxy ips, put in the list below
+    proxies = get_list_of_proxies()
+    proxy_pool = cycle(proxies)
 
-    # import json
-    # json_str = '{"symfony/dependency-injection":{"version":"v4.2.3","advisories":[{"title":"CVE-2019-10910: Check service IDs are valid","link":"https://symfony.com/cve-2019-10910","cve":"CVE-2019-10910"}]},"symfony/http-foundation":{"version":"v4.2.3","advisories":[{"title":"CVE-2019-10913: Reject invalid HTTP method overrides","link":"https://symfony.com/cve-2019-10913","cve":"CVE-2019-10913"}]},"twig/twig":{"version":"v2.6.2","advisories":[{"title":"Sandbox Information Disclosure","link":"https://symfony.com/blog/twig-sandbox-information-disclosure","cve":""}]}}'
-    # json_dict = json.loads(json_str)
-    # for k in json_dict:
-    #     ver = json_dict[k]["version"]
-    #     print(f"{k}=={ver}")
+    url = 'https://httpbin.org/ip'
+    for i in range(1,11):
+        #Get a proxy from the pool
+        proxy = next(proxy_pool)
+        print("Request #%d"%i)
+        try:
+            response = requests.get(url,proxies={"http": proxy, "https": proxy})
+            print(response.json())
+        except:
+            #Most free proxies will often get connection errors. You will have retry the entire request using another proxy to work.
+            #We will just skip retries as its beyond the scope of this tutorial and we are only downloading a single url
+            print("Skipping. Connnection error")
