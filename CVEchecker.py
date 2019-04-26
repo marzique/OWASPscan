@@ -9,12 +9,13 @@ from helpers.colors import bcolors
 from tqdm import tqdm
 from bs4 import BeautifulSoup
 from itertools import cycle
+from subprocess import check_output
 import numpy as np
 import traceback
 import os
 import glob
 import requests
-
+import json
 
 
 def get_random_ua(ua_file=None):
@@ -148,7 +149,7 @@ def check_php_dependencies(path_to_composer_dot_lock):
     """Check composer.lock file for vulnurable dependencies,
     return them
     """
-    # https://github.com/FriendsOfPHP/security-advisories - THANKS FOR API (fuck you for limit)!
+    # https://github.com/FriendsOfPHP/security-advisories - THANKS FOR API (fuck you for requests limit)!
     #  curl -H "Accept: application/json" https://security.symfony.com/check_lock -F lock=@/path/to/composer.lock
 
     vulnurable = []
@@ -164,6 +165,7 @@ def check_php_dependencies(path_to_composer_dot_lock):
 
     bad_proxy = True
     count = 1
+    curl_attempt = False
 
     while bad_proxy:
         if count >= 150:
@@ -192,6 +194,16 @@ def check_php_dependencies(path_to_composer_dot_lock):
                 continue
 
         except:
+            # try to get results via cURL once (after 1st requests attempt)
+            if not curl_attempt:
+                print(bcolors.OKGREEN + f"cURL request to API attempt" + bcolors.OKGREEN)
+                try:
+                    cmd = ["curl", "-H", "Accept: application/json", "https://security.symfony.com/check_lock", "-F", "lock=@tests/composer.lock"]
+                    json_response = check_output(cmd)
+                except:
+                    print(bcolors.OKGREEN + f"cURL request to API failed" + bcolors.OKGREEN)
+                curl_attempt = True
+
             print(bcolors.WARNING + f"Request limit for API exceeded! Trying another proxy" + bcolors.OKGREEN)
             count += 1
             continue
@@ -226,16 +238,8 @@ if __name__ == "__main__":
     # print(pyvul)
 
     # DETECT VULN IN COMPOSER.LOCK [PHP]
-    # print(check_php_dependencies("tests/composer.lock"))
+    print(check_php_dependencies("tests/composer.lock"))
 
 
     # list of proxies
     # get_list_of_proxies()
-
-    from subprocess import call, check_output
-    f = open('txt.txt', 'w')
-    print(os.getcwd())
-    cmd = ["curl", "-H", "Accept: application/json", "https://security.symfony.com/check_lock", "-F", "lock=@tests/composer.lock"]
-    # call(cmd, stdout=f)
-    outpp = check_output(cmd)
-    print(outpp)
