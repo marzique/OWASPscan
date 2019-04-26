@@ -8,6 +8,8 @@ from packaging.version import Version
 from helpers.colors import bcolors
 from tqdm import tqdm
 from bs4 import BeautifulSoup
+from itertools import cycle
+import traceback
 import os
 import glob
 import requests
@@ -129,21 +131,44 @@ def check_php_dependencies(path_to_composer_dot_lock):
 
     vulnurable = []
 
+    proxies = get_list_of_proxies()
+    proxy_pool = cycle(proxies)
+
     # request to API stuff
     headers = {'Accept': 'application/json',}
     files = {'lock': (path_to_composer_dot_lock, open(path_to_composer_dot_lock, 'rb')),}
 
-    try:
-        json_response = requests.post('https://security.symfony.com/check_lock', headers=headers, files=files).json()
-    except:
-        print(bcolors.WARNING + f"Request limit for API exceeded!" + bcolors.OKGREEN)
-        return None
+    bad_proxy = True
+    count = 1
 
-    if not isinstance(json_response, dict) or "error" in json_response:
-        print(bcolors.WARNING + f"Request limit for API exceeded!" + bcolors.OKGREEN)
-        return None
+    while bad_proxy:
+        #Get a proxy from the pool
+        proxy = next(proxy_pool)
+        print(f"Request #{count}, proxy ip: {proxy}")
 
-    elif json_response:
+        try:
+            count += 1
+            json_response = requests.post('https://security.symfony.com/check_lock',
+                                          headers=headers,
+                                          files=files,
+                                          proxies={"http": proxy, "https": proxy}
+                                          ).json()
+            if isinstance(json_response, dict):
+                if "error" in json_response:
+                    print(bcolors.WARNING + f"Request limit for API exceeded! Trying another proxy" + bcolors.OKGREEN)
+                    continue
+                else:
+                    bad_proxy = False
+            else:
+                print(bcolors.WARNING + f"Request limit for API exceeded! Trying another proxy" + bcolors.OKGREEN)
+                continue
+
+        except:
+            print(bcolors.WARNING + f"Request limit for API exceeded! Trying another proxy" + bcolors.OKGREEN)
+            count += 1
+            continue
+
+    if json_response:
         for k in json_response:
             ver = json_response[k]["version"]
             print(bcolors.FAIL + f"Vulnurable dependency version found  {k}=={ver}" + bcolors.OKGREEN)
@@ -173,26 +198,7 @@ if __name__ == "__main__":
     # print(pyvul)
 
     # DETECT VULN IN COMPOSER.LOCK [PHP]
-    # print(check_php_dependencies("tests/composer.lock"))
+    print(check_php_dependencies("tests/composer.lock"))
 
     # list of proxies
     # get_list_of_proxies()
-
-    from itertools import cycle
-    import traceback
-    #If you are copy pasting proxy ips, put in the list below
-    proxies = get_list_of_proxies()
-    proxy_pool = cycle(proxies)
-
-    url = 'https://httpbin.org/ip'
-    for i in range(1,11):
-        #Get a proxy from the pool
-        proxy = next(proxy_pool)
-        print("Request #%d"%i)
-        try:
-            response = requests.get(url,proxies={"http": proxy, "https": proxy})
-            print(response.json())
-        except:
-            #Most free proxies will often get connection errors. You will have retry the entire request using another proxy to work.
-            #We will just skip retries as its beyond the scope of this tutorial and we are only downloading a single url
-            print("Skipping. Connnection error")
