@@ -7,7 +7,6 @@ from helpers.colors import bcolors
 from wappalyzer.analyzer import getSimple, getDetail
 import helpers.ascii_art as art
 from checkssl import check_site
-from tqdm import tqdm
 from spider.crawler import Crawler
 from spider.adminpage import search_admin_pages
 
@@ -146,4 +145,3 @@ class Configer:
         """Return list of all webpages"""
         crawler = Crawler(url, no_verbose, limit=self.pagelimit)
         return crawler.start()
-        
