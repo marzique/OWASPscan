@@ -8,14 +8,12 @@ from packaging.version import Version
 from helpers.colors import bcolors
 from tqdm import tqdm
 from bs4 import BeautifulSoup
-from itertools import cycle
 from subprocess import check_output
-import numpy as np
-import traceback
 import os
-import glob
-import requests
 import json
+from lxml import etree, objectify
+from lxml.etree import XMLSyntaxError
+from requests_html import HTMLSession
 
 
 
@@ -71,6 +69,10 @@ def detect_language(list_of_files):
     return list(set(programming_languages))
 
 
+########################################################
+#########################PYTHON#########################
+########################################################
+
 def refresh_python_dependencies():
     """Download and refresh insecure.json and insecure_full.json"""
     insecure = requests.get("https://raw.githubusercontent.com/pyupio/safety-db/master/data/insecure.json")
@@ -116,6 +118,9 @@ def check_python_dependencies(path_to_requirements):
                 print(bcolors.OKGREEN + f"Dependency version is not vulnurable for  {dependency, specifier}" + bcolors.OKGREEN)
     return vulnurable
 
+########################################################
+###########################PHP##########################
+########################################################
 
 def check_php_dependencies(path_to_composer_dot_lock):
     """Check composer.lock file for vulnurable dependencies, return list of them. 
@@ -163,19 +168,82 @@ def check_php_dependencies(path_to_composer_dot_lock):
 
     return vulnurable
 
+########################################################
+#########################C_SHARP########################
+########################################################
 
-def check_csharp_dependencies():
-    pass
+def xml_validate(some_xml_string, xsd_file):
+    try:
+        schema = etree.XMLSchema(file=xsd_file)
+        parser = objectify.makeparser(schema=schema)
+        objectify.fromstring(some_xml_string, parser)
+        print(bcolors.OKGREEN + f"XML check: OK!")
+        return True
+    except XMLSyntaxError:
+        print(bcolors.OKGREEN + f"XML check: OK!")
+        return False
+
+def csharp_dependencies_dict(path_to_packages_dot_config):
+    """Return dict {package: version,} from packages.config file.
+    Return None if file is corrupted
+    """
+
+    packages_list = {}
+
+    # validate XML 
+    with open(path_to_packages_dot_config, "rb") as bytes_for_check:
+        if not xml_validate(bytes_for_check.read(), "assets/packages_config.xsd"):
+            return None
+    
+    with open(path_to_packages_dot_config, "r") as fo:
+        xml = fo.read()
+    
+    soup = BeautifulSoup(xml, "xml")
+    packages = soup.find_all("package")
+    for package in packages:
+        packages_list[package["id"]] = package["version"]
+
+    return packages_list
+
+
+def parse_js_html(url, sleep_time=5):
+    """Parse webpage that uses JavaScript to load elements.
+    Return HTML.
+    """
+
+    session = HTMLSession()
+    r = session.get(url)
+    r.html.render(sleep=sleep_time)
+    return r.html.html
+
+
+def check_csharp_dependencies(path_to_packages_dot_config):
+    """Check packages.config file for vulnurable dependencies, return list of them. 
+    Using 'https://www.sourceclear.com/vulnerability-database/search#query=' as API
+    """
+
+    packages = csharp_dependencies_dict(path_to_packages_dot_config)
+    for package in packages:
+        pass
+
+
+########################################################
+###########################RUBY#########################
+########################################################
 
 def check_ruby_dependencies():
     pass
+
+########################################################
+###########################JAVA#########################
+########################################################
 
 def check_java_dependencies():
     pass
 
 if __name__ == "__main__":
+    path = os.getcwd()
     # get all files and PL
-    # path = os.getcwd()
     # print(get_list_of_files(path, False))
     # print(detect_language(get_list_of_files(path)))
 
@@ -183,6 +251,11 @@ if __name__ == "__main__":
     # pyvul = check_python_dependencies("tests/vulnurable_reqs.txt")
     # print(pyvul)
 
+    # DETECT VULNURABILITIES IN composer.lock [PHP]
+    # print(check_php_dependencies("tests/composer.lock"))
 
-    print(check_php_dependencies(os.getcwd() + "/tests/composer.lock"))
+    # print(csharp_dependencies_dict("tests/packages.config"))
 
+
+    url = "https://www.sourceclear.com/vulnerability-database/search#query=Microsoft.jQuery.Unobtrusive.Validation"
+    print(parse_js_html(url))
