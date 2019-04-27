@@ -18,37 +18,6 @@ import requests
 import json
 
 
-def get_random_ua(ua_file=None):
-    """Return random User-Agent from file"""
-    random_ua = ''
-    if not ua_file:
-        ua_file = 'data/ua_data.txt'
-    try:
-        with open(ua_file) as f:
-            lines = f.readlines()
-        if len(lines) > 0:
-            prng = np.random.RandomState()
-            index = prng.permutation(len(lines) - 1)
-            idx = np.asarray(index, dtype=np.integer)[0]
-            random_ua = lines[int(idx)]
-    except Exception as ex:
-        print('Exception in random_ua')
-        print(str(ex))
-    finally:
-        return random_ua
-
-def get_list_of_proxies():
-    """Return list of parsed IPs from free proxy website"""
-
-    proxies = []
-    res = requests.get('https://free-proxy-list.net/', headers={'User-Agent':'Mozilla/5.0'})
-    soup = BeautifulSoup(res.text,"lxml")
-    print(bcolors.OKGREEN + "Parsing list of proxy servers:")
-    for items in tqdm(soup.select("tbody tr")):
-        proxy_address = ':'.join([item.text for item in items.select("td")[:2]])
-        # print(proxy_address)
-        proxies.append(proxy_address)
-    return proxies
 
 def get_list_of_files(dir_name, source_code=True):
     """Return list of all files within given directory and subdirectories
@@ -157,59 +126,32 @@ def check_php_dependencies(path_to_composer_dot_lock):
 
     vulnurable = []
 
-    proxies = get_list_of_proxies()
-    proxy_pool = cycle(proxies)
-    user_agent = get_random_ua()
     # request to API stuff
-    headers = {'Accept': 'application/json',
-               'user-agent': user_agent,
-              }
+    headers = {'Accept': 'application/json',}
     files = {'lock': (path_to_composer_dot_lock, open(path_to_composer_dot_lock, 'rb')),}
 
-    bad_proxy = True
-    count = 1
-    curl_attempt = False
+    try:
+        print(bcolors.OKGREEN + f"Parsing results via requests...")
+        json_response = requests.post('https://security.symfony.com/check_lock',
+                                        headers=headers,
+                                        files=files,
+                                        ).json()
+        if "error" in json_response:
+            print(bcolors.WARNING + f"Request limit for API exceeded!" + bcolors.OKGREEN)
+            raise Exception
 
-    while bad_proxy:
-        if count >= 150:
-            print(bcolors.WARNING + f"Can't check composer.json, all proxies returned error" + bcolors.OKGREEN)
-            return None
-        #Get a proxy from the pool
-        proxy = next(proxy_pool)
-        print(f"Request #{count}, proxy ip: {proxy}")
-
+    except:
+        # try to get results via cURL once (after 1st requests attempt)
+        print(bcolors.OKGREEN + f"Can't parse via requests, trying cURL call to API" + bcolors.OKGREEN)
         try:
-
-            json_response = requests.post('https://security.symfony.com/check_lock',
-                                          headers=headers,
-                                          files=files,
-                                          proxies={"http": proxy, "https": proxy},
-                                          ).json()
-            count += 1
-            if isinstance(json_response, dict):
-                if "error" in json_response:
-                    print(bcolors.WARNING + f"Request limit for API exceeded! Trying another proxy" + bcolors.OKGREEN)
-                    continue
-                else:
-                    bad_proxy = False
-            else:
-                print(bcolors.WARNING + f"Request limit for API exceeded! Trying another proxy" + bcolors.OKGREEN)
-                continue
-
+            cmd = ["curl", "-H", "Accept: application/json", "https://security.symfony.com/check_lock", "-F", "lock=@tests/composer.lock"]
+            json_response = check_output(cmd)
+            if "error" in json_response:
+                print(bcolors.WARNING + f"Request limit for API exceeded!" + bcolors.OKGREEN)
+                raise Exception
         except:
-            # try to get results via cURL once (after 1st requests attempt)
-            if not curl_attempt:
-                print(bcolors.OKGREEN + f"cURL request to API attempt" + bcolors.OKGREEN)
-                try:
-                    cmd = ["curl", "-H", "Accept: application/json", "https://security.symfony.com/check_lock", "-F", "lock=@tests/composer.lock"]
-                    json_response = check_output(cmd)
-                except:
-                    print(bcolors.OKGREEN + f"cURL request to API failed" + bcolors.OKGREEN)
-                curl_attempt = True
-
-            print(bcolors.WARNING + f"Request limit for API exceeded! Trying another proxy" + bcolors.OKGREEN)
-            count += 1
-            continue
+            print(bcolors.OKGREEN + f"cURL request to API failed" + bcolors.OKGREEN)
+            return None
 
     if json_response:
         for k in json_response:
@@ -232,17 +174,15 @@ def check_java_dependencies():
     pass
 
 if __name__ == "__main__":
-    path = os.getcwd()
-    print(get_list_of_files(path, False))
-    print(detect_language(get_list_of_files(path)))
+    # get all files and PL
+    # path = os.getcwd()
+    # print(get_list_of_files(path, False))
+    # print(detect_language(get_list_of_files(path)))
 
     # DETECT VULNURABILITIES IN REQ.TXT [PYTHON]
     # pyvul = check_python_dependencies("tests/vulnurable_reqs.txt")
     # print(pyvul)
 
 
-    # print(check_php_dependencies("tests/composer.lock"))
+    print(check_php_dependencies(os.getcwd() + "/tests/composer.lock"))
 
-
-    # list of proxies
-    # get_list_of_proxies()
