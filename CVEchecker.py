@@ -118,8 +118,8 @@ def check_python_dependencies(path_to_requirements):
 
 
 def check_php_dependencies(path_to_composer_dot_lock):
-    """Check composer.lock file for vulnurable dependencies,
-    return them
+    """Check composer.lock file for vulnurable dependencies, return list of them. 
+    If request limit for API reached - return None.
     """
     # https://github.com/FriendsOfPHP/security-advisories - THANKS FOR API (fuck you for requests limit)!
     #  curl -H "Accept: application/json" https://security.symfony.com/check_lock -F lock=@/path/to/composer.lock
