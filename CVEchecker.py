@@ -10,14 +10,16 @@ import os
 import glob
 import requests
 
-def get_list_of_files(dir_name, extensions=None):
-    """Return list of all source code files within given directory and subdirectories"""
+def get_list_of_files(dir_name, source_code=True):
+    """Return list of all files within given directory and subdirectories
+    source_code parameter used to return only source code files
+    """
 
     # create a list of file and sub directories
     # names in the given directory
     list_of_files = os.listdir(dir_name)
-    if not extensions:
-        extensions = (".py", ".cs", ".jar", "java", ".php", ".rb")
+    
+    extensions = (".py", ".cs", ".jar", "java", ".php", ".rb")
     all_files = list()
     # Iterate over all the entries
     for entry in list_of_files:
@@ -31,10 +33,11 @@ def get_list_of_files(dir_name, extensions=None):
 
     # remove paths
     filenames_only = [path_name.rsplit('/', 1)[-1] for path_name in all_files]
-    # leave only source code files
-    source_code_filenames = [source for source in filenames_only if source.endswith(extensions)]
+    if source_code:
+        # leave only source code files
+        filenames_only = [source for source in filenames_only if source.endswith(extensions)]
 
-    return source_code_filenames
+    return filenames_only
 
 
 def check_github_url(self, string):
@@ -149,14 +152,15 @@ def check_java_dependencies():
     pass
 
 if __name__ == "__main__":
-    # path = os.getcwd()
-    # print(detect_language(get_list_of_files(path)))
+    path = os.getcwd()
+    print(get_list_of_files(path, False))
+    print(detect_language(get_list_of_files(path)))
 
     # pyvul = check_python_dependencies("tests/vulnurable_reqs.txt")
     # print(pyvul)
 
 
-    print(check_php_dependencies("tests/composer.lock"))
+    # print(check_php_dependencies("tests/composer.lock"))
 
 
     # import json
