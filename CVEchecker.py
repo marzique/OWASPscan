@@ -11,6 +11,7 @@ from bs4 import BeautifulSoup
 from subprocess import check_output
 import os
 import json
+import re
 from lxml import etree, objectify
 from lxml.etree import XMLSyntaxError
 from requests_html import HTMLSession
@@ -217,7 +218,7 @@ def parse_js_html(url, sleep_time=5):
     return r.html.html
 
 
-def check_package(package_name):
+def check_package(package_name, package_version):
     """Check vulnurabilities for package:version, return None if not found"""
 
     url = "https://www.sourceclear.com/vulnerability-database/search#query=" + package_name + "%20language:csharp"
@@ -226,7 +227,16 @@ def check_package(package_name):
     soup = BeautifulSoup(html, "html.parser")
     results = soup.find_all(class_="bo-b--2")
     for result in results:
-        print(result.a.string)
+        found_title = result.a.string
+        print(f"Found: {found_title}")
+
+
+        version_string = result.find(string=re.compile("Latest Version")) # clean up and retrieve just version %d.%d.%d
+        version = re.findall(r"Latest Version: ([\d.]*\d+)", version_string)[0]
+        print(version)
+
+        vuln_num = int(result.find(string=re.compile("Number of Vulnerabilities")).parent.findNext(class_='grid__item').string)
+        print(f"Vulnurabilities: {vuln_num}")
         # TODO
         # https://stackoverflow.com/questions/5999747/beautifulsoup-nextsibling
 
@@ -271,4 +281,4 @@ if __name__ == "__main__":
     # print(csharp_dependencies_dict("tests/packages.config"))
 
 
-    check_package("Microsoft.Owin.Security.Cookies")
+    check_package("Microsoft.Owin.Security.Cookies", "3.0.1")
