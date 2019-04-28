@@ -342,8 +342,23 @@ def check_ruby_dependencies(path_to_gemfile_dot_lock):
     """
     vulnurable_gems = []
 
-    # maybe time.sleep (50.0 / 1000.0)
-    # TODO
+    gems = ruby_gems_load(path_to_gemfile_dot_lock)
+
+    for gem in gems:
+        latest_version = check_gem_version(gem)
+
+        if not latest_version:
+            print(bcolors.WARNING + f"{gem} gem not found, skipping" + bcolors.OKGREEN)
+            continue
+
+        gem_version = gems[gem]
+        if compare_versions(latest_version, gem_version):
+            print(bcolors.FAIL + f"{gem} with vulnurable version {gem_version} found!" + bcolors.OKGREEN)
+            vulnurable_gems.append(gem)
+        else:
+            print(bcolors.OKGREEN + f"{gem} gem with version {gem_version} is safe, no vulnurabilities found.")
+        
+        time.sleep (50.0 / 1000.0) # ~10 requests per second to not reach limit
 
     return vulnurable_gems
     
@@ -377,5 +392,4 @@ if __name__ == "__main__":
 
     # DETECT VULNURABILITIES IN packages.config [C#]
     # print(check_csharp_dependencies("tests/packages.config"))         
-    #     
-    print(ruby_gems_load("tests/Gemfile.lock"))
+    print(check_ruby_dependencies("tests/Gemfile.lock"))
