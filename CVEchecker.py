@@ -18,6 +18,10 @@ from requests_html import HTMLSession
 from packaging import version
 
 
+########################################################
+#########################HELPERS########################
+########################################################
+
 def get_list_of_files(dir_name, source_code=True):
     """Return list of all files within given directory and subdirectories
     source_code parameter used to return only source code files
@@ -174,6 +178,8 @@ def check_php_dependencies(path_to_composer_dot_lock):
 ########################################################
 
 def xml_validate(some_xml_string, xsd_file):
+    """Validate XML file correctness agains schema"""
+
     try:
         schema = etree.XMLSchema(file=xsd_file)
         parser = objectify.makeparser(schema=schema)
@@ -208,7 +214,7 @@ def csharp_dependencies_dict(path_to_packages_dot_config):
 
 
 def parse_js_html(url, sleep_time=5):
-    """Parse webpage that uses JavaScript to load elements.
+    """Scrape webpage that uses JavaScript to load elements.
     Return HTML.
     """
 
@@ -259,14 +265,14 @@ def check_csharp_dependencies(path_to_packages_dot_config):
     """
     vulnurable_packages = []
 
+    # get dict of packages
     packages = csharp_dependencies_dict(path_to_packages_dot_config)
+
+
     for package in packages:
         vulnurabilities_found = check_package(package, packages[package])
-        if vulnurabilities_found is None:
-            pass
-        else:
-            if vulnurabilities_found >= 1:
-                vulnurable_packages.append(package)
+        if vulnurabilities_found is not None and vulnurabilities_found >= 1:
+            vulnurable_packages.append(package)
     
     return vulnurable_packages
 
@@ -276,6 +282,7 @@ def check_csharp_dependencies(path_to_packages_dot_config):
 ########################################################
 
 def check_ruby_dependencies():
+    #TODO
     pass
 
 ########################################################
@@ -283,20 +290,27 @@ def check_ruby_dependencies():
 ########################################################
 
 def check_java_dependencies():
+    #TODO
     pass
 
+
+########################################################
+######################MAIN ALGORITHM####################
+########################################################
+
 if __name__ == "__main__":
-    path = os.getcwd()
+    # path = os.getcwd()
+    
     # get all files and PL
     # print(get_list_of_files(path, False))
     # print(detect_language(get_list_of_files(path)))
 
-    # DETECT VULNURABILITIES IN REQ.TXT [PYTHON]
+    # DETECT VULNURABILITIES IN requirements.txt [PYTHON]
     # pyvul = check_python_dependencies("tests/vulnurable_reqs.txt")
     # print(pyvul)
 
     # DETECT VULNURABILITIES IN composer.lock [PHP]
     # print(check_php_dependencies("tests/composer.lock"))
 
-
-    print(check_csharp_dependencies("tests/packages.config"))             
+    # DETECT VULNURABILITIES IN packages.config [C#]
+    # print(check_csharp_dependencies("tests/packages.config"))             
