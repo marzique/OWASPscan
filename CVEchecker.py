@@ -121,6 +121,7 @@ def check_python_dependencies(path_to_requirements):
                 vulnurable.append(dependency)
             else:
                 print(bcolors.OKGREEN + f"Dependency version is not vulnurable for  {dependency, specifier}" + bcolors.OKGREEN)
+
     return vulnurable
 
 ########################################################
@@ -281,9 +282,28 @@ def check_csharp_dependencies(path_to_packages_dot_config):
 ###########################RUBY#########################
 ########################################################
 
-def check_ruby_dependencies():
-    #TODO
-    pass
+def ruby_gems_load(path_to_gemfile_dot_lock):
+    """Return gem list from Gemfile.lock file.
+    Return None if file is corrupted.
+    """
+    stream = open(path_to_gemfile_dot_lock, 'r') 
+    
+    print(stream.read())
+
+def check_gem_version(gem_name):
+    """Return gem version from API https://rubygems.org/api/v1/versions/%GEM_NAME%/latest.json, 
+    if gem name is wrong(not found) return None
+    """
+
+    api_url = "https://rubygems.org/api/v1/versions/" + gem_name + "/latest.json"
+    json_response = requests.get(api_url).json()
+
+    # bad gem name
+    if json_response["version"] == "unknown":
+        return None
+
+    return json_response["version"]
+    
 
 ########################################################
 ###########################JAVA#########################
@@ -300,7 +320,7 @@ def check_java_dependencies():
 
 if __name__ == "__main__":
     # path = os.getcwd()
-    
+
     # get all files and PL
     # print(get_list_of_files(path, False))
     # print(detect_language(get_list_of_files(path)))
