@@ -235,10 +235,10 @@ def compare_versions(v1, v2):
     """Return True if v1 > v2, else (<=) - False"""
     return version.parse(v1) > version.parse(v2)
 
-def check_package(package_name, package_version):
+def check_package(package_name, package_version, language):
     """Check vulnurabilities for package:version, return None if not found"""
 
-    url = "https://www.sourceclear.com/vulnerability-database/search#query=" + package_name + "%20language:csharp"
+    url = "https://www.sourceclear.com/vulnerability-database/search#query=" + package_name + "%20language:" + language
     html = parse_js_html(url)
     soup = BeautifulSoup(html, "html.parser")
 
@@ -278,7 +278,7 @@ def check_csharp_dependencies(path_to_packages_dot_config):
 
 
     for package in packages:
-        vulnurabilities_found = check_package(package, packages[package])
+        vulnurabilities_found = check_package(package, packages[package], "csharp")
         if vulnurabilities_found is not None and vulnurabilities_found >= 1:
             vulnurable_packages.append(package)
     
@@ -399,9 +399,23 @@ def java_dependencies_dict(path_to_pom_dot_xml):
     return dependencies_list
 
 
-def check_java_dependencies():
-    #TODO
-    pass
+def check_java_dependencies(path_to_packages_dot_config):
+    """
+    Check packages.config file for vulnurable dependencies, return list of them. 
+    Using 'https://www.sourceclear.com/vulnerability-database/search#query=' as API
+    """
+    vulnurable_packages = []
+
+    # get dict of packages
+    packages = java_dependencies_dict(path_to_packages_dot_config)
+
+
+    for package in packages:
+        vulnurabilities_found = check_package(package, packages[package], "java")
+        if vulnurabilities_found is not None and vulnurabilities_found >= 1:
+            vulnurable_packages.append(package)
+    
+    return vulnurable_packages
 
 
 ########################################################
@@ -427,4 +441,5 @@ if __name__ == "__main__":
     # DETECT VULNURABILITIES IN Gemfile.lock                    [Ruby]
     # print(check_ruby_dependencies("tests/Gemfile.lock"))
 
-    print(java_dependencies_dict("tests/pom.xml"))
+    # DETECT VULNURABILITIES IN pom.xml                         [Java]
+    # print(check_java_dependencies("tests/pom.xml"))  
