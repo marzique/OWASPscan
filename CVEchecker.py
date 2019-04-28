@@ -15,7 +15,7 @@ import re
 from lxml import etree, objectify
 from lxml.etree import XMLSyntaxError
 from requests_html import HTMLSession
-
+from packaging import version
 
 
 def get_list_of_files(dir_name, source_code=True):
@@ -178,10 +178,10 @@ def xml_validate(some_xml_string, xsd_file):
         schema = etree.XMLSchema(file=xsd_file)
         parser = objectify.makeparser(schema=schema)
         objectify.fromstring(some_xml_string, parser)
-        print(bcolors.OKGREEN + f"XML check: OK!")
+        print(bcolors.OKGREEN + "XML check: OK!")
         return True
     except XMLSyntaxError:
-        print(bcolors.OKGREEN + f"XML check: OK!")
+        print(bcolors.OKGREEN + "XML check: OK!")
         return False
 
 def csharp_dependencies_dict(path_to_packages_dot_config):
@@ -218,37 +218,57 @@ def parse_js_html(url, sleep_time=5):
     return r.html.html
 
 
+def compare_versions(v1, v2):
+    """Return True if v1 > v2, else (<=) - False"""
+    return version.parse(v1) > version.parse(v2)
+
 def check_package(package_name, package_version):
     """Check vulnurabilities for package:version, return None if not found"""
 
     url = "https://www.sourceclear.com/vulnerability-database/search#query=" + package_name + "%20language:csharp"
     html = parse_js_html(url)
-    # bo-b--2
     soup = BeautifulSoup(html, "html.parser")
+
+    # get list of found results
     results = soup.find_all(class_="bo-b--2")
     for result in results:
         found_title = result.a.string
-        print(f"Found: {found_title}")
+        vulnurabilities_amount = int(result.find(string=re.compile("Number of Vulnerabilities")).parent.findNext(class_='grid__item').string)
 
+        if found_title == package_name:
+            if vulnurabilities_amount > 0:
+                version_string = result.find(string=re.compile("Latest Version"))
+                version = re.findall(r"Latest Version: ([\d.]*\d+)", version_string)[0]
+                if compare_versions(version, package_version):
+                    return 0
+                    print(bcolors.OKGREEN + "Package version is safe, no vulnurabilities found.")
+                else:
+                    print(bcolors.FAIL + f"{package_name} with vulnurable version {package_version} found!" + bcolors.OKGREEN)
+                    return vulnurabilities_amount
+            else:
+                print(bcolors.OKGREEN + f"{package_name} package is safe, no vulnurabilities found.")
+                return 0
+    # not found any info
+    print(bcolors.WARNING + f"No info availible for {package_name}. Skipping..." + bcolors.OKGREEN)
+    return None
 
-        version_string = result.find(string=re.compile("Latest Version")) # clean up and retrieve just version %d.%d.%d
-        version = re.findall(r"Latest Version: ([\d.]*\d+)", version_string)[0]
-        print(version)
-
-        vuln_num = int(result.find(string=re.compile("Number of Vulnerabilities")).parent.findNext(class_='grid__item').string)
-        print(f"Vulnurabilities: {vuln_num}")
-        # TODO
-        # https://stackoverflow.com/questions/5999747/beautifulsoup-nextsibling
-
-
+        
 def check_csharp_dependencies(path_to_packages_dot_config):
     """Check packages.config file for vulnurable dependencies, return list of them. 
     Using 'https://www.sourceclear.com/vulnerability-database/search#query=' as API
     """
+    vulnurable_packages = []
 
     packages = csharp_dependencies_dict(path_to_packages_dot_config)
     for package in packages:
-        pass
+        vulnurabilities_found = check_package(package, packages[package])
+        if vulnurabilities_found is None:
+            pass
+        else:
+            if vulnurabilities_found >= 1:
+                vulnurable_packages.append(package)
+    
+    return vulnurable_packages
 
 
 ########################################################
@@ -278,7 +298,5 @@ if __name__ == "__main__":
     # DETECT VULNURABILITIES IN composer.lock [PHP]
     # print(check_php_dependencies("tests/composer.lock"))
 
-    # print(csharp_dependencies_dict("tests/packages.config"))
 
-
-    check_package("Microsoft.Owin.Security.Cookies", "3.0.1")
+    print(check_csharp_dependencies("tests/packages.config"))             
