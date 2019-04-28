@@ -381,9 +381,20 @@ def java_dependencies_dict(path_to_pom_dot_xml):
     dependencies = soup.find_all("dependency")
     for dependency in dependencies:
         dep_name = dependency.find("artifactId").string
-        dep_version = dependency.find("version").string
+        full_version = dependency.find("version").string
+
+        if not full_version[-1].isdigit():
+            # e.g. 3.1.6.asdkjaskd
+            dep_version = full_version[:full_version.rindex('.')]
+        else:
+            # e.g. 1.2.6
+            dep_version = full_version
+
+        # check if we explicitly have version which starts from digit
         if dep_version[0].isdigit():
             dependencies_list[dep_name] = dep_version
+        else:
+            print(bcolors.WARNING + f"{dep_name} dependency version not specified, skipping" + bcolors.OKGREEN)
 
     return dependencies_list
 
