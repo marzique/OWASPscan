@@ -239,9 +239,9 @@ def check_package(package_name, package_version):
             if vulnurabilities_amount > 0:
                 version_string = result.find(string=re.compile("Latest Version"))
                 version = re.findall(r"Latest Version: ([\d.]*\d+)", version_string)[0]
-                if compare_versions(version, package_version):
+                if not compare_versions(version, package_version):
                     return 0
-                    print(bcolors.OKGREEN + "Package version is safe, no vulnurabilities found.")
+                    print(bcolors.OKGREEN + f"{package_name} package version {package_version} is safe, no vulnurabilities found.")
                 else:
                     print(bcolors.FAIL + f"{package_name} with vulnurable version {package_version} found!" + bcolors.OKGREEN)
                     return vulnurabilities_amount
