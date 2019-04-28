@@ -301,15 +301,22 @@ def ruby_gems_load(path_to_gemfile_dot_lock):
 
     with open(path_to_gemfile_dot_lock, 'r') as gemfile:
         for line in gemfile:
+            # start appending if encounter line with specs:
             if "specs:" in line:
                 start_record = True
                 continue
+            # gems finished
             if "PLATFORMS" in line:
                 break
+            # add only gem without it's own dependencies
             if start_record:
                 if line.startswith("    ") and line[4].isalpha():
                     gems.append(line.strip())
-    print(gems)
+    for gemline in gems:
+        gemname, gem_version = gemline[:-1].split(" (")
+        gem_dict[gemname] = gem_version
+    
+    return gem_dict
     
 
 def check_gem_version(gem_name):
@@ -371,4 +378,4 @@ if __name__ == "__main__":
     # DETECT VULNURABILITIES IN packages.config [C#]
     # print(check_csharp_dependencies("tests/packages.config"))         
     #     
-    ruby_gems_load("tests/Gemfile.lock")
+    print(ruby_gems_load("tests/Gemfile.lock"))
