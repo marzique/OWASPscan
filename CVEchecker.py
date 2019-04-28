@@ -16,6 +16,7 @@ from lxml import etree, objectify
 from lxml.etree import XMLSyntaxError
 from requests_html import HTMLSession
 from packaging import version
+import time
 
 
 ########################################################
@@ -23,7 +24,8 @@ from packaging import version
 ########################################################
 
 def get_list_of_files(dir_name, source_code=True):
-    """Return list of all files within given directory and subdirectories
+    """
+    Return list of all files within given directory and subdirectories
     source_code parameter used to return only source code files
     """
 
@@ -97,7 +99,8 @@ def refresh_python_dependencies():
         f.truncate()
 
 def check_python_dependencies(path_to_requirements):
-    """Check requirements.txt for vulnurable dependencies,
+    """
+    Check requirements.txt for vulnurable dependencies,
     return them
     """
 
@@ -129,7 +132,8 @@ def check_python_dependencies(path_to_requirements):
 ########################################################
 
 def check_php_dependencies(path_to_composer_dot_lock):
-    """Check composer.lock file for vulnurable dependencies, return list of them. 
+    """
+    Check composer.lock file for vulnurable dependencies, return list of them. 
     If request limit for API reached - return None.
     """
     # https://github.com/FriendsOfPHP/security-advisories - THANKS FOR API (fuck you for requests limit)!
@@ -192,7 +196,8 @@ def xml_validate(some_xml_string, xsd_file):
         return False
 
 def csharp_dependencies_dict(path_to_packages_dot_config):
-    """Return dict {package: version,} from packages.config file.
+    """
+    Return dict {package: version,} from packages.config file.
     Return None if file is corrupted
     """
 
@@ -215,7 +220,8 @@ def csharp_dependencies_dict(path_to_packages_dot_config):
 
 
 def parse_js_html(url, sleep_time=5):
-    """Scrape webpage that uses JavaScript to load elements.
+    """
+    Scrape webpage that uses JavaScript to load elements.
     Return HTML.
     """
 
@@ -261,7 +267,8 @@ def check_package(package_name, package_version):
 
         
 def check_csharp_dependencies(path_to_packages_dot_config):
-    """Check packages.config file for vulnurable dependencies, return list of them. 
+    """
+    Check packages.config file for vulnurable dependencies, return list of them. 
     Using 'https://www.sourceclear.com/vulnerability-database/search#query=' as API
     """
     vulnurable_packages = []
@@ -283,16 +290,32 @@ def check_csharp_dependencies(path_to_packages_dot_config):
 ########################################################
 
 def ruby_gems_load(path_to_gemfile_dot_lock):
-    """Return gem list from Gemfile.lock file.
+    """
+    Return gem dict from Gemfile.lock file.
     Return None if file is corrupted.
     """
-    stream = open(path_to_gemfile_dot_lock, 'r') 
+    gem_dict = {}
+
+    start_record = False
+    gems = []
+
+    with open(path_to_gemfile_dot_lock, 'r') as gemfile:
+        for line in gemfile:
+            if "specs:" in line:
+                start_record = True
+                continue
+            if "PLATFORMS" in line:
+                break
+            if start_record:
+                if line.startswith("    ") and line[4].isalpha():
+                    gems.append(line.strip())
+    print(gems)
     
-    print(stream.read())
 
 def check_gem_version(gem_name):
-    """Return gem version from API https://rubygems.org/api/v1/versions/%GEM_NAME%/latest.json, 
-    if gem name is wrong(not found) return None
+    """
+    Return gem version from API https://rubygems.org/api/v1/versions/%GEM_NAME%/latest.json, 
+    if gem name is wrong (not found) return None
     """
 
     api_url = "https://rubygems.org/api/v1/versions/" + gem_name + "/latest.json"
@@ -303,6 +326,19 @@ def check_gem_version(gem_name):
         return None
 
     return json_response["version"]
+
+
+def check_ruby_dependencies(path_to_gemfile_dot_lock):
+    """
+    Check Gemfile.lock file for vulnurable (read outdated) dependencies, 
+    return list of them, if none found return None. 
+    """
+    vulnurable_gems = []
+
+    # maybe time.sleep (50.0 / 1000.0)
+    # TODO
+
+    return vulnurable_gems
     
 
 ########################################################
@@ -333,4 +369,6 @@ if __name__ == "__main__":
     # print(check_php_dependencies("tests/composer.lock"))
 
     # DETECT VULNURABILITIES IN packages.config [C#]
-    # print(check_csharp_dependencies("tests/packages.config"))             
+    # print(check_csharp_dependencies("tests/packages.config"))         
+    #     
+    ruby_gems_load("tests/Gemfile.lock")
