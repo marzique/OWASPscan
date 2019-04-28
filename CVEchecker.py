@@ -217,6 +217,20 @@ def parse_js_html(url, sleep_time=5):
     return r.html.html
 
 
+def check_package(package_name):
+    """Check vulnurabilities for package:version, return None if not found"""
+
+    url = "https://www.sourceclear.com/vulnerability-database/search#query=" + package_name + "%20language:csharp"
+    html = parse_js_html(url)
+    # bo-b--2
+    soup = BeautifulSoup(html, "html.parser")
+    results = soup.find_all(class_="bo-b--2")
+    for result in results:
+        print(result.a.string)
+        # TODO
+        # https://stackoverflow.com/questions/5999747/beautifulsoup-nextsibling
+
+
 def check_csharp_dependencies(path_to_packages_dot_config):
     """Check packages.config file for vulnurable dependencies, return list of them. 
     Using 'https://www.sourceclear.com/vulnerability-database/search#query=' as API
@@ -257,5 +271,4 @@ if __name__ == "__main__":
     # print(csharp_dependencies_dict("tests/packages.config"))
 
 
-    url = "https://www.sourceclear.com/vulnerability-database/search#query=Microsoft.jQuery.Unobtrusive.Validation"
-    print(parse_js_html(url))
+    check_package("Microsoft.Owin.Security.Cookies")
