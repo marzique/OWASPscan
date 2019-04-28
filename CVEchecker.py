@@ -367,6 +367,27 @@ def check_ruby_dependencies(path_to_gemfile_dot_lock):
 ###########################JAVA#########################
 ########################################################
 
+def java_dependencies_dict(path_to_pom_dot_xml):
+    """
+    Return dict {package: version,} from pom.xml file.
+    Return None if file is corrupted
+    """
+    dependencies_list = {}
+
+    with open(path_to_pom_dot_xml, "r") as fo:
+        xml = fo.read()
+    
+    soup = BeautifulSoup(xml, "xml")
+    dependencies = soup.find_all("dependency")
+    for dependency in dependencies:
+        dep_name = dependency.find("artifactId").string
+        dep_version = dependency.find("version").string
+        if dep_version[0].isdigit():
+            dependencies_list[dep_name] = dep_version
+
+    return dependencies_list
+
+
 def check_java_dependencies():
     #TODO
     pass
@@ -383,13 +404,16 @@ if __name__ == "__main__":
     # print(get_list_of_files(path, False))
     # print(detect_language(get_list_of_files(path)))
 
-    # DETECT VULNURABILITIES IN requirements.txt [PYTHON]
-    # pyvul = check_python_dependencies("tests/vulnurable_reqs.txt")
-    # print(pyvul)
+    # DETECT VULNURABILITIES IN requirements.txt                [PYTHON]
+    # print(check_python_dependencies("tests/vulnurable_reqs.txt"))
 
-    # DETECT VULNURABILITIES IN composer.lock [PHP]
+    # DETECT VULNURABILITIES IN composer.lock                   [PHP]
     # print(check_php_dependencies("tests/composer.lock"))
 
-    # DETECT VULNURABILITIES IN packages.config [C#]
-    # print(check_csharp_dependencies("tests/packages.config"))         
-    print(check_ruby_dependencies("tests/Gemfile.lock"))
+    # DETECT VULNURABILITIES IN packages.config                 [C#]
+    # print(check_csharp_dependencies("tests/packages.config"))   
+
+    # DETECT VULNURABILITIES IN Gemfile.lock                    [Ruby]
+    # print(check_ruby_dependencies("tests/Gemfile.lock"))
+
+    print(java_dependencies_dict("tests/pom.xml"))
