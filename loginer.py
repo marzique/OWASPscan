@@ -1,4 +1,3 @@
-"""TODO"""
 from helpers.colors import bcolors
 from tqdm import tqdm
 from bs4 import BeautifulSoup

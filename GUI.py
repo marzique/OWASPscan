@@ -2,9 +2,8 @@
 from tkinter import *
 from tkinter import messagebox, filedialog
 import os
-from application import start_configer, start_loginer
+from application import start_configer, start_loginer, start_dependencer
 import time
-from CVEchecker import analyse_folder
 
 
 settings = {"local": False,
@@ -26,6 +25,7 @@ def execute():
         provide_folder()
         return
     
+    # normalize URL
     if not url.startswith(("http://", "https://")):
         url = "http://" + url
 
@@ -33,6 +33,7 @@ def execute():
         lim = int(limit.get())
         settings["page_limit"] = lim
     except:
+        # ignore if user provided not integer
         pass
 
     if r_var.get() == "--enterprise":
@@ -41,8 +42,9 @@ def execute():
         settings["local"] = True
     c = start_configer(settings, url=url)
     l = start_loginer(c)
-    vulns = analyse_folder(folder)
-    print(vulns)
+    d = start_dependencer(folder)
+    
+    # TODO
 
     time_minutes = str((time.time() - start) / 60)[:4]
     print(f"OWASPscan took {time_minutes} minutes")

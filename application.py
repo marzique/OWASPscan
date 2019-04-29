@@ -3,6 +3,7 @@ import argparse
 import sys
 from configer import Configer
 from loginer import Loginer
+from CVEchecker import Dependencer
 
 
 def start_configer(settings, url=None):
@@ -19,19 +20,7 @@ def start_loginer(c):
     l.start_hack()
     return l
 
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("URL", help="target website")
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("--local", action="store_true", help="localhost server")
-    group.add_argument("--enterprise", action="store_true", help="working website")
-    args = vars(parser.parse_args())
-    if args["local"]:
-        local = True
-    elif args["enterprise"]:
-        local = False
-    c = Configer(args["URL"], local=local)
-    c.output_configuration()
-    l = Loginer(c)
-    l.start_hack()
+def start_dependencer(folder):
+    d = Dependencer(folder)
+    d.analyse_folder()
+    return d
