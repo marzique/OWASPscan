@@ -422,12 +422,63 @@ def check_java_dependencies(path_to_packages_dot_config):
 ######################MAIN ALGORITHM####################
 ########################################################
 
-if __name__ == "__main__":
-    # path = os.getcwd()
 
-    # get all files and PL
-    # print(get_list_of_files(path, False))
-    # print(detect_language(get_list_of_files(path)))
+
+def analyse_folder(path_to_folder):
+    language_dep_files = {"python": "requirements.txt",
+                          "c#": "packages.config",
+                          "php": "composer.lock",
+                          "ruby": "Gemfile.lock",
+                          "java": "pom.xml"
+    }
+
+    vulnurabilities = []
+
+    filenames = get_list_of_files(path_to_folder, False)
+    languages = detect_language(filenames)
+    main_config = None
+
+    for language in languages:
+        dependency_file = language_dep_files[language]
+        if dependency_file in filenames:
+            print(bcolors.OKGREEN + f"{dependency_file} file found! Starting scan...")
+            main_config = language
+            break
+        elif language != languages[-1]:
+            print(bcolors.WARNING + f"{dependency_file} file not found! Checking next language..." + bcolors.OKGREEN)
+            continue
+    else:
+        print(bcolors.FAIL + f"No dependencies file found for any language. Aborting..." + bcolors.OKGREEN)
+        return None, []
+    
+    if main_config == "python":
+        refresh_python_dependencies()
+        path = path_to_folder + "/requirements.txt"
+        vulnurabilities = check_python_dependencies(path)
+    elif main_config == "php":
+        path = path_to_folder + "/composer.lock"
+        vulnurabilities = check_php_dependencies(path)
+    elif main_config == "c#":
+        path = path_to_folder + "/packages.config"
+        vulnurabilities = check_csharp_dependencies(path)
+    elif main_config == "ruby":
+        path = path_to_folder + "/Gemfile.lock"
+        vulnurabilities = check_ruby_dependencies(path)
+    elif main_config == "java":
+        path = path_to_folder + "/pom.xml"
+        vulnurabilities = check_java_dependencies(path)
+
+    return main_config, vulnurabilities
+
+
+if __name__ == "__main__":
+
+    path = os.getcwd()
+
+    language, vulnurabilities = analyse_folder("/home/tarn/Desktop/dev")
+    if all([language, vulnurabilities]):
+        total_vulns = len(vulnurabilities)
+        print(f"Detected language: {language}, found {total_vulns} vulnurabilities")
 
     # DETECT VULNURABILITIES IN requirements.txt                [PYTHON]
     # print(check_python_dependencies("tests/vulnurable_reqs.txt"))
