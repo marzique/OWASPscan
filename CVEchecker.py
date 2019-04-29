@@ -19,6 +19,7 @@ from packaging import version
 import time
 
 
+
 ########################################################
 #########################HELPERS########################
 ########################################################
@@ -449,7 +450,7 @@ def analyse_folder(path_to_folder):
             continue
     else:
         print(bcolors.FAIL + f"No dependencies file found for any language. Aborting..." + bcolors.OKGREEN)
-        return None, []
+        return None
     
     if main_config == "python":
         refresh_python_dependencies()
@@ -468,29 +469,22 @@ def analyse_folder(path_to_folder):
         path = path_to_folder + "/pom.xml"
         vulnurabilities = check_java_dependencies(path)
 
-    return main_config, vulnurabilities
+    return vulnurabilities
 
 
 if __name__ == "__main__":
 
-    path = os.getcwd()
-
-    language, vulnurabilities = analyse_folder("/home/tarn/Desktop/dev")
-    if all([language, vulnurabilities]):
-        total_vulns = len(vulnurabilities)
-        print(f"Detected language: {language}, found {total_vulns} vulnurabilities")
-
     # DETECT VULNURABILITIES IN requirements.txt                [PYTHON]
-    # print(check_python_dependencies("tests/vulnurable_reqs.txt"))
+    print(check_python_dependencies("tests/vulnurable_reqs.txt"))
 
     # DETECT VULNURABILITIES IN composer.lock                   [PHP]
-    # print(check_php_dependencies("tests/composer.lock"))
+    print(check_php_dependencies("tests/composer.lock"))
 
     # DETECT VULNURABILITIES IN packages.config                 [C#]
-    # print(check_csharp_dependencies("tests/packages.config"))   
+    print(check_csharp_dependencies("tests/packages.config"))   
 
     # DETECT VULNURABILITIES IN Gemfile.lock                    [Ruby]
-    # print(check_ruby_dependencies("tests/Gemfile.lock"))
+    print(check_ruby_dependencies("tests/Gemfile.lock"))
 
     # DETECT VULNURABILITIES IN pom.xml                         [Java]
-    # print(check_java_dependencies("tests/pom.xml"))  
+    print(check_java_dependencies("tests/pom.xml"))  
