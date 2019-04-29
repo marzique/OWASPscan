@@ -4,9 +4,6 @@
 - 
 
 
-## Refactor
-- separate 'configer' actions to their modules
-
 ------------
 ### Main Modules
 
@@ -20,14 +17,14 @@
 - XSS
 	- find out best python way to check it
 
-## AUTHENTIFICATOR:
+## ~AUTHENTIFICATOR~:
 - ~try to bruteforce pages - can we or not~
-- check vocabulary attack
+- ~check vocabulary attack~
 - ~check for CAPTCHA~
 - 
 
-## CVE
-- check folder via API
+## ~CVE~
+- ~check folder via API~
 
 ## CONFIGER
 - check for more sensitive info possible via URL

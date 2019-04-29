@@ -6,9 +6,14 @@ from time import gmtime, strftime
 from helpers.colors import bcolors
 from wappalyzer.analyzer import getSimple, getDetail
 import helpers.ascii_art as art
-from checkssl import check_site
 from spider.crawler import Crawler
 from spider.adminpage import search_admin_pages
+import ssl
+import OpenSSL
+import socket
+import re
+from datetime import datetime
+from helpers.helpers import strip_url
 
 
 class Configer:
@@ -26,7 +31,7 @@ class Configer:
         self.compression = self.get_compression()
         self.os = self.get_os()
         self.programming_lang = self.get_language()
-        self.certificate = check_site(self.url)
+        self.certificate = self.check_ssl(self.url)
         self.pages = []
         self.adminpages = []
         self.pagelimit = settings["page_limit"]
@@ -145,3 +150,16 @@ class Configer:
         """Return list of all webpages"""
         crawler = Crawler(url, no_verbose, limit=self.pagelimit)
         return crawler.start()
+    
+
+    def check_ssl(self, url):
+        """TODO"""
+        hostname = strip_url(url)
+        port = 443
+        try:
+            cert = ssl.get_server_certificate((hostname, port))
+            x509 = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, cert)
+            date_until = str(datetime.strptime(x509.get_notAfter().decode('ascii'), '%Y%m%d%H%M%SZ'))
+            return '\033[1;36mvalid until ' + date_until
+        except ssl.SSLError as e:
+            return bcolors.FAIL + 'certificate not found'

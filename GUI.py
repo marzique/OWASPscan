@@ -1,6 +1,6 @@
-"""TODO"""
+"""GUI app wrapper"""
 from tkinter import *
-from tkinter import messagebox
+from tkinter import messagebox, filedialog
 import os
 from application import start_configer, start_loginer
 import time
@@ -53,6 +53,11 @@ def toggle_pagelimit():
         limit.grid(row = 4, column = 1, sticky=E)
         limitlabel.grid(row = 4, sticky=E)
 
+
+def choose_folder():
+    dirname = filedialog.askdirectory(parent=tk, initialdir="/", title='Please select a website root directory')
+    return dirname
+
 tk = Tk()
 tk.title("OWASPscan")
 tk.minsize(600, 400)
@@ -95,20 +100,24 @@ url_field.grid(row = 0, column = 1, sticky = W)
 r_var = StringVar()
 r_var.set("--enterprise")
 
+# Select project's folder
+Button(tk, text = "Website root folder", command = choose_folder, bg="blue", fg="white").grid(row = 1, column = 1, sticky = W)
+
 # Server type
-Label(tk, text = "Server:").grid(row = 1, column = 0, sticky=E)
-Radiobutton(tk, text="localhost", variable=r_var, value="--local").grid(row = 1, column = 1, sticky = W)
-Radiobutton(tk, text="enterprise", variable=r_var, value="--enterprise").grid(row = 2, column = 1, sticky = W)
+Label(tk, text = "Server:").grid(row = 2, column = 0, sticky=E)
+Radiobutton(tk, text="localhost", variable=r_var, value="--local").grid(row = 2, column = 1, sticky = W)
+Radiobutton(tk, text="enterprise", variable=r_var, value="--enterprise").grid(row = 3, column = 1, sticky = W)
+
 
 # Page search limit
-Label(tk, text = "limit pages?").grid(row = 3, column = 0, sticky=E)
+Label(tk, text = "limit pages?").grid(row = 4, column = 0, sticky=E)
 page_limit = IntVar()
-Checkbutton(tk, variable=page_limit, command=toggle_pagelimit).grid(row=3, column = 1, sticky=W)
+Checkbutton(tk, variable=page_limit, command=toggle_pagelimit).grid(row=5, column = 1, sticky=W)
 limitlabel = Label(tk, text = "Page search limit:")
 limit = Entry(tk)
 
 # Search button
-Button(tk, text = "Begin scan", command = execute, bg="green", fg="white").grid(row = 5, column = 1, sticky = W)
+Button(tk, text = "Begin scan", command = execute, bg="green", fg="white").grid(row = 6, column = 1, sticky = W)
 
 label2 = Label(text="Tarnavskyi Denys, 2019", justify=LEFT, fg="grey")
 label2.place(relx=0, rely=0.95)
