@@ -77,7 +77,8 @@ class Dependencer():
         """Return list of programming languages used from input list of files"""
 
         programming_languages = []
-        for f in list_of_files:
+        print(bcolors.OKGREEN + "Detecting programming language(s):")
+        for f in tqdm(list_of_files):
             if f.endswith(".py"):
                 programming_languages.append("python")
             elif f.endswith(".cs"):
@@ -88,6 +89,7 @@ class Dependencer():
                 programming_languages.append("ruby")
             elif f.endswith((".jar", ".java")):
                 programming_languages.append("java")
+            time.sleep (50.0 / 1000.0)
 
         unique = list(set(programming_languages))
 
@@ -124,11 +126,12 @@ class Dependencer():
         Check requirements.txt for vulnurable dependencies,
         return them
         """
-        # convert to dict TODO
+
         vulnurable = {}
         fo = open(path_to_requirements, "r")
         dependencies = fo.read().splitlines()
-        for dependency in dependencies:
+        print(bcolors.OKGREEN + "Checking requirements.txt for Python vulnurabilities:")
+        for dependency in tqdm(dependencies):
             library, version = dependency.split("==")
             # try to get vulnurable versions of library
             try:
@@ -144,8 +147,7 @@ class Dependencer():
                     vulnurable[dependency] = specifier
                 else:
                     print(bcolors.OKGREEN + f"Dependency version is not vulnurable for  {dependency, specifier}" + bcolors.OKGREEN)
-        # update object
-        self.vulnurabilities = vulnurable
+            time.sleep (50.0 / 1000.0)
 
         return vulnurable
 
@@ -184,21 +186,21 @@ class Dependencer():
                 cmd = ["curl", "-H", "Accept: application/json", "https://security.symfony.com/check_lock", "-F", "lock=@tests/composer.lock"]
                 json_response = check_output(cmd)
                 if "error" in json_response:
-                    print(bcolors.WARNING + f"Request limit for API exceeded!" + bcolors.OKGREEN)
+                    print(bcolors.WARNING + "Request limit for API exceeded!" + bcolors.OKGREEN)
                     raise Exception
             except:
-                print(bcolors.OKGREEN + f"cURL request to API failed" + bcolors.OKGREEN)
+                print(bcolors.OKGREEN + "cURL request to API failed" + bcolors.OKGREEN)
                 return None
 
         if json_response:
-            for k in json_response:
+            print(bcolors.OKGREEN + "Checking composer.lock for PHP vulnurabilities")
+            for k in tqdm(json_response):
                 ver = json_response[k]["version"]
                 print(bcolors.FAIL + f"Vulnurable dependency version found  {k}=={ver}" + bcolors.OKGREEN)
                 vulnurable[k] = ver
+                time.sleep (50.0 / 1000.0)
         else:
             print(bcolors.OKGREEN + f"No vulnurabilites found")
-
-        self.vulnurabilities = vulnurable
 
         return vulnurable
 
@@ -300,16 +302,13 @@ class Dependencer():
         # get dict of packages
         packages = self.csharp_dependencies_dict(path_to_packages_dot_config)
 
-
-        for package in packages:
+        print(bcolors.OKGREEN + "Checking packages.config for C# vulnurabilities")
+        for package in tqdm(packages):
             version = packages[package]
             vulnurabilities_found = self.check_package(package, version, "csharp")
             if vulnurabilities_found is not None and vulnurabilities_found >= 1:
                 vulnurable_packages[package] = version
         
-        # update object
-        self.vulnurabilities = vulnurable_packages
-
         return vulnurable_packages
 
 
@@ -372,7 +371,8 @@ class Dependencer():
 
         gems = self.ruby_gems_load(path_to_gemfile_dot_lock)
 
-        for gem in gems:
+        print(bcolors.OKGREEN + "Checking Gemfile.lock for Ruby vulnurabilities")
+        for gem in tqdm(gems):
             latest_version = self.check_gem_version(gem)
 
             if not latest_version:
@@ -388,8 +388,6 @@ class Dependencer():
             
             time.sleep (50.0 / 1000.0) # ~10 requests per second to not reach limit
 
-        # update object
-        self.vulnurabilities = vulnurable_gems
 
         return vulnurable_gems
         
@@ -410,7 +408,9 @@ class Dependencer():
         
         soup = BeautifulSoup(xml, "xml")
         dependencies = soup.find_all("dependency")
-        for dependency in dependencies:
+
+        print(bcolors.OKGREEN + "Checking pom.xml for Java vulnurabilities")
+        for dependency in tqdm(dependencies):
             dep_name = dependency.find("artifactId").string
             full_version = dependency.find("version").string
 
@@ -441,14 +441,12 @@ class Dependencer():
         packages = self.java_dependencies_dict(path_to_packages_dot_config)
 
 
-        for package in packages:
+        for package in tqdm(packages):
             version = packages[package]
             vulnurabilities_found = self.check_package(package, version, "java")
             if vulnurabilities_found is not None and vulnurabilities_found >= 1:
                 vulnurable_packages[package] = version
 
-        # update object
-        self.vulnurabilities = vulnurable_packages
         
         return vulnurable_packages
 
@@ -459,6 +457,14 @@ class Dependencer():
 
 
     def analyse_folder(self, path_to_folder=None):
+        """Fetch all filenames, detect main programming language, find file with dependencies, 
+        check dependencies agains DBs, APIs, Scrappers. 
+        Return list of vulnurabilities
+        """
+
+        print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
+        print(bcolors.OKGREEN + "-------------------------CVE DEPENDENCIES CHECK----------------------------")
+        print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
 
         if not path_to_folder:
             path_to_folder = self.folder
@@ -508,6 +514,13 @@ class Dependencer():
             path = path_to_folder + "/pom.xml"
             vulnurabilities = self.check_java_dependencies(path)
 
+        # update object
+        self.vulnurabilities = vulnurabilities
+
+        print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
+        print(bcolors.OKGREEN + "---------------------------CVE CHECK FINISHED------------------------------")
+        print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
+
         return vulnurabilities
 
 
@@ -516,16 +529,16 @@ if __name__ == "__main__":
     deper = Dependencer("~/Descktop/scaner")
 
     # DETECT VULNURABILITIES IN requirements.txt                [PYTHON]
-    # print(deper.check_python_dependencies("tests/vulnurable_reqs.txt"))
+    print(deper.check_python_dependencies("tests/vulnurable_reqs.txt"))
 
     # DETECT VULNURABILITIES IN composer.lock                   [PHP]
-    # print(deper.check_php_dependencies("tests/composer.lock"))
+    print(deper.check_php_dependencies("tests/composer.lock"))
 
     # DETECT VULNURABILITIES IN packages.config                 [C#]
-    # print(deper.check_csharp_dependencies("tests/packages.config"))   
+    print(deper.check_csharp_dependencies("tests/packages.config"))   
 
     # DETECT VULNURABILITIES IN Gemfile.lock                    [Ruby]
-    # print(deper.check_ruby_dependencies("tests/Gemfile.lock"))
+    print(deper.check_ruby_dependencies("tests/Gemfile.lock"))
 
     # DETECT VULNURABILITIES IN pom.xml                         [Java]
-    # print(deper.check_java_dependencies("tests/pom.xml"))  
+    print(deper.check_java_dependencies("tests/pom.xml"))  

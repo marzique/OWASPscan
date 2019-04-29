@@ -26,7 +26,7 @@ class Loginer:
 
 	def start_hack(self):
 		print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
-		print(bcolors.OKGREEN + "--------------------------Loginer scan search------------------------------")
+		print(bcolors.OKGREEN + "--------------------------LOGINER SCAN SEARCH------------------------------")
 		print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
 		self.filtered_pages = self.filter_pages(self.adminpages)
 		print(bcolors.OKGREEN + "Bruteforce check:")
@@ -35,7 +35,7 @@ class Loginer:
 			print(bcolors.OKGREEN + "---------------------------Vocabulary attack-------------------------------")
 			self.vocabulary_attack(self.filtered_pages)
 		print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
-		print(bcolors.OKGREEN + "-------------------------Loginer scan finished-----------------------------")
+		print(bcolors.OKGREEN + "---------------------------LOGINER FINISHED--------------------------------")
 		print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
 
 	def get_raw_html(self, url):

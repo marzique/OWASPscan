@@ -83,7 +83,7 @@ class Configer:
         print(bcolors.OKGREEN + "Connecting to " + bcolors.OKBLUE + self.url  + "..." + bcolors.OKGREEN)
         art.update_progress(2)
         print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
-        print(bcolors.OKGREEN + "---------------------------Configuration scan------------------------------")
+        print(bcolors.OKGREEN + "--------------------------CONFIGER SCAN SEARCH-----------------------------")
         print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
         print(bcolors.OKGREEN + f"GET REQUEST with cookie: {self.cookie}")
         print(bcolors.OKGREEN + f"Time of connection: {self.date}")
@@ -101,7 +101,7 @@ class Configer:
         self.pages = self.get_pages(self.url)
         print(bcolors.OKGREEN + f"Webpages found: {len(self.pages)}")
         print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
-        print(bcolors.OKGREEN + "-----------------------Configuration scan completed!-----------------------")
+        print(bcolors.OKGREEN + "-----------------------------CONFIGER FINISHED-----------------------------")
         print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
         print(bcolors.RESET)
 
