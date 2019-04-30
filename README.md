@@ -6,7 +6,7 @@ This is my Master’s degree final project.
 ### Screenshots
 
 ## GUI
-![image](https://user-images.githubusercontent.com/25755345/56098844-ae009c80-5f0d-11e9-88a7-6f95351021b4.png)
+![image](https://user-images.githubusercontent.com/25755345/56935371-3b8ce080-6af9-11e9-9677-baff80bbf484.png)
 
 ## Output
 
