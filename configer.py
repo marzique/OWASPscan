@@ -139,10 +139,15 @@ class Configer:
     def get_language(self):
         """Try to get programming language from header"""
         try:
+            # 1st try 
             return bcolors.FAIL + self.detected['programming-languages'] + bcolors.RESET
-        except:
-            # TODO: https://www.owasp.org/index.php/Testing_for_HTTP_Parameter_pollution_(OTG-INPVAL-004)
-            return bcolors.CYAN + 'hidden' + bcolors.RESET
+        except KeyError:
+            try:
+                # 2nd try
+                return bcolors.FAIL + self.r.headers['X-Powered-By'] + bcolors.RESET
+            except KeyError:
+                # TODO: https://www.owasp.org/index.php/Testing_for_HTTP_Parameter_pollution_(OTG-INPVAL-004)
+                return bcolors.CYAN + 'hidden' + bcolors.RESET
 
 
     def get_pages(self, url, no_verbose=False):

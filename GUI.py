@@ -41,8 +41,8 @@ def execute():
     elif r_var.get() == "--local":
         settings["local"] = True
     c = start_configer(settings, url=url)
-    l = start_loginer(c)
-    d = start_dependencer(folder)
+    # l = start_loginer(c)
+    # d = start_dependencer(folder)
 
     # TODO
 

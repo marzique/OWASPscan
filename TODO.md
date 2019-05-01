@@ -28,7 +28,7 @@
 
 ## CONFIGER
 - Country/City https://api.hackertarget.com/geoip/?q=rt.rpd.univ.kiev.ua
-- 3rd way to check programming language: https://api.hackertarget.com/httpheaders/?q=http://univ.kiev.ua/
+- ~3rd way to check programming language: https://api.hackertarget.com/httpheaders/?q=univ.kiev.ua~
 -
 - check folder!
 ------------
