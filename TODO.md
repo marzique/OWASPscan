@@ -1,7 +1,7 @@
 ## bug fixes/features
 - find bloody bug which causes recursive url growth!
 - check/hack FTP
-- 
+-
 
 
 ------------
@@ -21,18 +21,18 @@
 - ~try to bruteforce pages - can we or not~
 - ~check vocabulary attack~
 - ~check for CAPTCHA~
-- 
+-
 
 ## ~CVE~
 - ~check folder via API~
 
 ## CONFIGER
-- check for more sensitive info possible via URL
+- Country/City https://api.hackertarget.com/geoip/?q=rt.rpd.univ.kiev.ua
+- 3rd way to check programming language: https://api.hackertarget.com/httpheaders/?q=http://univ.kiev.ua/
+-
 - check folder!
 ------------
 
 ### Output
 - Fancy PDF (or similar) report with GREEN vs RED parts, connect it with OWASP TOP 10 list
 - Maybe e-mail it.
-
-
