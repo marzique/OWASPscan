@@ -31,13 +31,13 @@ class DO_Reflect_Attack(object):
 
         # @return "find" or "None"
         result = self.__do_Reflect_GET_Attack(inserturl)
-        if result != None:
+        if result:
             print(bcolors.FAIL + "Reflected GET XSS exists!" + bcolors.OKGREEN)
-            return "find"
+            return result
         result = self.__do_Reflect_POST_Attack(inserturl)
-        if result != None:
+        if result:
             print(bcolors.FAIL + "Reflected POST XSS exists!" + bcolors.OKGREEN)
-            return "find"
+            return result
 
         print(bcolors.CYAN +
               "Reflected XSS vulnurabilities not found!" + bcolors.OKGREEN)
@@ -66,7 +66,7 @@ class DO_Reflect_Attack(object):
             # 若返回码是200，则判断response html，是否存在XSS漏洞
             html = response.read()
             if judge_HTML_If_XSS_Exist(html, self.__attack_vector_list[vector_i]):
-                return "find"
+                return self.__attack_vector_list[vector_i]
 
     def __do_Reflect_POST_Attack(self, inserturl):
         '''
@@ -105,7 +105,7 @@ class DO_Reflect_Attack(object):
 
             # 判断response html，是否存在XSS漏洞
             if judge_HTML_If_XSS_Exist(html, self.__attack_vector_list[vector_i]):
-                return "find"
+                return self.__attack_vector_list[vector_i]
 
 
 class Attack_Vector_Factory(object):
@@ -363,8 +363,4 @@ def judge_HTML_If_XSS_Exist(html, attack_vector):
 
 
 def main(url_with_params):
-    DO_Reflect_Attack(2).do_Reflect_Attack(url_with_params)
-
-
-if __name__ == "__main__":
-    main()
+    return DO_Reflect_Attack(2).do_Reflect_Attack(url_with_params)
