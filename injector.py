@@ -11,12 +11,16 @@ from helpers.colors import bcolors
 
 
 class Injector:
-    """"""
+    """
+    Perform various injection attacks/checks, 
+    store info about vulnurabilities found.
+    """
 
     def __init__(self, url, path_to_folder):
         self.url = url
         self.folder = path_to_folder
         self.xss_links = {}  # store url: xss_snippet
+        self.injectable_xml_files = {}
         # TODO
 
     ########################################################
@@ -130,13 +134,20 @@ class Injector:
     ########################################################
 
     def xml_attack(self):
-        """"""
+        """Find """
         print(bcolors.OKGREEN + "checking XML files for possible injections...")
         xmler = XMLchecker()
-        xmler.input_checker(self.folder, None)
+        self.injectable_xml_files = xmler.input_checker(self.folder, None)
+
+        return self.injectable_xml_files
 
     ########################################################
     ####################   DESERIALIZE   ###################
+    ########################################################
+
+
+    ########################################################
+    ##################   MAIN ALGORITHM   ##################
     ########################################################
 
 
@@ -144,4 +155,4 @@ if __name__ == "__main__":
 
     injector = Injector("http://rt.rpd.univ.kiev.ua/", "tests")
     print(injector.xss_attack())
-    injector.xml_attack()
+    print(injector.xml_attack())

@@ -16,7 +16,7 @@ class Sequel:
     def __init__(self):
 
         self.pat = pattern
-        return
+        self.bad_files = {}
 
     def input_checker(self, target_folder, target_file):
         self.target_file = target_file
@@ -25,7 +25,8 @@ class Sequel:
             self.pattern_scan(self.target_file)
         else:
             self.iterate_files()
-        return
+
+        return self.bad_files 
 
     def iterate_files(self):
         for dirs, subdirs, files in os.walk(self.target_folder):
@@ -49,7 +50,7 @@ class Sequel:
                 pat = self.pat[key]
                 m = re.search(pat, line)
                 if m:
-                    print(bcolors.FAIL + "Found possible injection command!!" + bcolors.OKGREEN)
+                    print(bcolors.FAIL + "Found possible injection query!" + bcolors.OKGREEN)
                     print(f" file path     : {file_path}")
                     # print(f" detection     : {key}")
                     print(f" line number   : {line_num}")
@@ -57,6 +58,7 @@ class Sequel:
                     print(" line of code  :" + clr + line + bcolors.OKGREEN)
                     # print(f" string matched: {m.group()}")
                     # print(f" pattern       : {val}")
+                    self.bad_files[file_path] = line
 
                 line_num += 1
         return
