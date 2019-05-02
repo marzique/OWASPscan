@@ -6,15 +6,16 @@ from urllib.parse import urlparse, parse_qs
 from collections import deque
 import re
 from injections.XSS_Test import main as xss_check
+from injections.sequel import Sequel as XMLchecker
 from helpers.colors import bcolors
 
 
 class Injector:
     """"""
 
-    def __init__(self, url):
+    def __init__(self, url, path_to_folder):
         self.url = url
-        # self.folder = path_to_folder
+        self.folder = path_to_folder
         self.xss_links = {}  # store url: xss_snippet
         # TODO
 
@@ -107,7 +108,7 @@ class Injector:
         return dict containing url: xss_snippet
         """
 
-        all_urls = self._get_all_links_recursive(injector.url)
+        all_urls = self._get_all_links_recursive(self.url)
         parameter_urls = self._filter_parameter_pages(all_urls)
 
         for url in parameter_urls:
@@ -126,6 +127,12 @@ class Injector:
     ########################   XML   #######################
     ########################################################
 
+    def xml_attack(self):
+        """"""
+
+        xmler = XMLchecker()
+        xmler.input_checker(self.folder, None)
+
     ########################################################
     ####################   DESERIALIZE   ###################
     ########################################################
@@ -133,5 +140,6 @@ class Injector:
 
 if __name__ == "__main__":
 
-    injector = Injector("http://radiophysics.herokuapp.com/")
+    injector = Injector("https://xss-game.appspot.com/level1", "tests")
     print(injector.xss_attack())
+    injector.xml_attack()

@@ -14,8 +14,8 @@
 - XML, deserialize
 	- Somehow check if we have something to do with XML/serializing
 	- if we do - check vulnurabilities
-- XSS
-	- find out best python way to check it
+- ~XSS~
+	- ~find out best python way to check it~
 
 ## ~AUTHENTIFICATOR~:
 - ~try to bruteforce pages - can we or not~
