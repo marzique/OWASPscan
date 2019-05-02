@@ -108,6 +108,8 @@ class Injector:
         return dict containing url: xss_snippet
         """
 
+        print(bcolors.OKGREEN + "Starting XSS attack...")
+
         all_urls = self._get_all_links_recursive(self.url)
         parameter_urls = self._filter_parameter_pages(all_urls)
 
@@ -129,7 +131,7 @@ class Injector:
 
     def xml_attack(self):
         """"""
-
+        print(bcolors.OKGREEN + "checking XML files for possible injections...")
         xmler = XMLchecker()
         xmler.input_checker(self.folder, None)
 
@@ -140,6 +142,6 @@ class Injector:
 
 if __name__ == "__main__":
 
-    injector = Injector("https://xss-game.appspot.com/level1", "tests")
+    injector = Injector("http://rt.rpd.univ.kiev.ua/", "tests")
     print(injector.xss_attack())
     injector.xml_attack()
