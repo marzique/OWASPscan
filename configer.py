@@ -59,7 +59,7 @@ class Configer:
         try:
             return bcolors.OKGREEN + self.r.headers['Content-Encoding'] + bcolors.RESET
         except:
-            return bcolors.FAIL + "hidden"
+            return bcolors.CYAN + "hidden" + bcolors.OKGREEN
 
     def get_date(self):
         """Return current GMT from response header or generate it  manually"""
@@ -137,7 +137,7 @@ class Configer:
             except:
                 return bcolors.CYAN + 'hidden' + bcolors.RESET
         else:
-            return bcolors.WANING + platform.platform() + bcolors.RESET + bcolors.HEADER + ' [CURRENT PC]' + bcolors.RESET
+            return bcolors.WARNING + platform.platform() + bcolors.RESET + bcolors.HEADER + ' [CURRENT PC]' + bcolors.RESET
 
     def get_cookie(self):
         try:
@@ -149,7 +149,7 @@ class Configer:
         """Try to get programming language from header"""
         try:
             # 1st try
-            return bcolors.FAIL + self.detected['programming-languages'] + bcolors.RESET
+            return bcolors.FAIL + str(self.detected['programming-languages']) + bcolors.RESET
         except KeyError:
             try:
                 # 2nd try

@@ -11,8 +11,8 @@
 - SQL
 	- sqlmap or similar (via url)
 	- maybe something like form break (integrate with admin pages !)
-- XML, deserialize
-	- Somehow check if we have something to do with XML/serializing
+- ~XML~, deserialize
+	- Somehow check if we have something to do with ~XML~/serializing
 	- if we do - check vulnurabilities
 - ~XSS~
 	- ~find out best python way to check it~
@@ -30,7 +30,7 @@
 - Country/City https://api.hackertarget.com/geoip/?q=rt.rpd.univ.kiev.ua
 - ~3rd way to check programming language: https://api.hackertarget.com/httpheaders/?q=univ.kiev.ua~
 -
-- check folder!
+- ~check folder!~
 ------------
 
 ### Output
