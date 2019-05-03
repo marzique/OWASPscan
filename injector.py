@@ -8,6 +8,7 @@ import re
 from injections.XSS_Test import main as xss_check
 from injections.sequel import Sequel as XMLchecker
 from helpers.colors import bcolors
+from helpers.helpers import get_url_domain
 
 
 class Injector:
@@ -35,14 +36,12 @@ class Injector:
         """
         return xss_check(url_with_get_parameters)
     
-    def _get_url_domain(self, url):
-        return urlparse(url).netloc
 
     def _get_all_links_recursive(self, url):
         """Return all internal links from website"""
         
         # get base domain
-        domain_main = self._get_url_domain(url)
+        domain_main = get_url_domain(url)
 
         # a queue of urls to be crawled
         new_urls = deque([url])
@@ -62,13 +61,12 @@ class Injector:
             url = new_urls.popleft()
 
             # ignore links with hash, to prevent infinity loop 
-            while "#" in url or domain_main != self._get_url_domain(url):
+            while "#" in url or domain_main != get_url_domain(url):
                 if len(new_urls):
                     url = new_urls.popleft()
                 else:
                     break
-                    
-            print(url)
+
             processed_urls.add(url)
             # get url's content
             # print("Processing %s" % url)
@@ -128,7 +126,7 @@ class Injector:
         return dict containing url: xss_snippet
         """
 
-        print(bcolors.OKGREEN + "Starting XSS attack...")
+        print(bcolors.OKGREEN + "Searching for XSS injectable URLS...")
 
         all_urls = self._get_all_links_recursive(self.url)
         parameter_urls = self._filter_parameter_pages(all_urls)

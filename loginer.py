@@ -14,26 +14,20 @@ class Loginer:
 		"""
 		self.url = configer.url
 		self.adminpages = configer.adminpages 
-		self.filtered_pages = []
+		self.filtered_pages = []  # not hidden admin pages with forms!
+		self.bruteforced = []
 		self.passwords = open('assets/passwords.txt').readlines()
 		self.users = open('assets/users.txt').readlines()
-		self.vocabulary = False
 		self.gap = 100 # max difference between pages to be considered almots the same
 
-		# refactor this retarted way of passing True or False TODO!
-		# self.vocabulary = configer.settings["vocabulary"] 
-		# TODO
 
 	def start_hack(self):
 		print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
 		print(bcolors.OKGREEN + "--------------------------LOGINER SCAN SEARCH------------------------------")
 		print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
 		self.filtered_pages = self.filter_pages(self.adminpages)
-		print(bcolors.OKGREEN + "Bruteforce check:")
+		print(bcolors.OKGREEN + "Bruteforce/Vocabulary check:")
 		self.bruteforce_attack(self.filtered_pages)
-		if self.vocabulary:
-			print(bcolors.OKGREEN + "---------------------------Vocabulary attack-------------------------------")
-			self.vocabulary_attack(self.filtered_pages)
 		print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
 		print(bcolors.OKGREEN + "---------------------------LOGINER FINISHED--------------------------------")
 		print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
@@ -83,9 +77,9 @@ class Loginer:
 				if not self.has_captcha(html):
 					if self.has_login_form(html):
 						login_pages.append(page)
-						print(bcolors.CYAN + f"{page} has login form!")
+						print(bcolors.FAIL + f"{page} has login form!")
 				else:
-					print(bcolors.WARNING + f"{page} has CAPTCHA, ignoring")
+					print(bcolors.CYAN + f"{page} has CAPTCHA!, ignoring")
 			else:
 				print(bcolors.OKGREEN + f"can't parse HTML from: {page}")
 		return login_pages
@@ -168,6 +162,7 @@ class Loginer:
 			for page in stats:
 				if stats[page]:
 					print(bcolors.FAIL + page + bcolors.OKGREEN)
+					self.bruteforced.append(page)
 		else:
 			print(bcolors.CYAN + f"No bruteforce vulnurable pages found!")
 

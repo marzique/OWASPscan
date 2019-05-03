@@ -1,5 +1,6 @@
 """"""
 import re
+from urllib.parse import urlparse
 
 
 def strip_url(url):
@@ -15,3 +16,8 @@ def strip_url(url):
 def remove_parameters(url):
     head, _, _ = url.partition('?')
     return head
+
+
+
+def get_url_domain(url):
+    return urlparse(url).netloc

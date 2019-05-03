@@ -12,7 +12,7 @@ import OpenSSL
 import socket
 import re
 from datetime import datetime
-from helpers.helpers import strip_url
+from helpers.helpers import strip_url, get_url_domain
 
 
 class Configer:
@@ -26,7 +26,9 @@ class Configer:
         self.detected = getSimple(self.url)  # web-app confifuration
         self.cookie = self.get_cookie()
         self.date = self.get_date()
-        self.encoding = bcolors.WARNING + self.r.encoding
+        self.ip = self.get_ip()
+        self.location = self.get_location()
+        self.encoding = bcolors.OKGREEN + self.r.encoding
         self.server = self.get_server()
         self.compression = self.get_compression()
         self.os = self.get_os()
@@ -91,12 +93,14 @@ class Configer:
               "--------------------------CONFIGER SCAN SEARCH-----------------------------")
         print(bcolors.OKGREEN +
               "---------------------------------------------------------------------------")
-        print(bcolors.OKGREEN + f"GET REQUEST with cookie: {self.cookie}")
+        print(bcolors.OKGREEN + f"HTTP cookie: {self.cookie}")
+        print(bcolors.OKGREEN + f"Server IP address: {self.ip}")
+        print(bcolors.OKGREEN + f"Server geo location: {self.location}")
         print(bcolors.OKGREEN + f"Time of connection: {self.date}")
         print(bcolors.OKGREEN + f"Certificate: {self.certificate}")
-        print(bcolors.OKGREEN + f"Server: {self.server}")
+        print(bcolors.OKGREEN + f"Server type: {self.server}")
         print(bcolors.OKGREEN + f"Operating system: {self.os}")
-        print(bcolors.OKGREEN + f"Encoding: {self.encoding}")
+        print(bcolors.OKGREEN + f"Content encoding: {self.encoding}")
         print(bcolors.OKGREEN +
               f"Programming language: {self.programming_lang}")
         print(bcolors.OKGREEN + f"Compression: {self.compression}")
@@ -141,9 +145,9 @@ class Configer:
 
     def get_cookie(self):
         try:
-            return bcolors.FAIL + self.r.headers['Set-Cookie'] + bcolors.RESET
+            return bcolors.OKGREEN + self.r.headers['Set-Cookie'] + bcolors.RESET
         except KeyError:
-            return bcolors.CYAN + "hidden" + bcolors.RESET
+            return bcolors.FAIL + "hidden" + bcolors.OKGREEN
 
     def get_language(self):
         """Try to get programming language from header"""
@@ -176,4 +180,36 @@ class Configer:
             return '\033[1;36mvalid until ' + date_until
         except ssl.SSLError as e:
             print(e)
-            return bcolors.FAIL + "certificate not found"
+            return bcolors.FAIL + "no OV/DV certificate found"
+
+
+    def get_ip(self):
+        """Return IP address from IP API"""
+
+        api_request = "http://ip-api.com/json/" + get_url_domain(self.url)
+        json_response = requests.get(api_request).json()
+        
+        try:
+            ip = bcolors.FAIL
+            end = ""
+            if "cloudflare" in str(json_response).lower():
+                ip = bcolors.WARNING
+                end = " [cloudflare]"
+            return ip + json_response["query"] + end + bcolors.OKGREEN
+        except KeyError:
+            return bcolors.CYAN + "hidden" + bcolors.OKGREEN
+
+
+
+    def get_location(self):
+        """Return geo location from IP API"""
+
+        api_request = "http://ip-api.com/json/" + get_url_domain(self.url)
+        json_response = requests.get(api_request).json()
+
+        try:
+            return bcolors.WARNING + json_response["city"] + ", " + json_response["country"] + bcolors.OKGREEN
+
+        except KeyError:
+            return bcolors.CYAN + "hidden" + bcolors.OKGREEN
+
