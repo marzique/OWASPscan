@@ -2,7 +2,7 @@
 from tkinter import *
 from tkinter import messagebox, filedialog
 import os
-from application import start_configer, start_loginer, start_dependencer
+from application import start_configer, start_loginer, start_dependencer, start_injector
 import time
 
 
@@ -40,9 +40,11 @@ def execute():
         settings["local"] = False
     elif r_var.get() == "--local":
         settings["local"] = True
+        
     c = start_configer(settings, url=url)
     l = start_loginer(c)
     d = start_dependencer(folder)
+    i = start_injector(url, folder)
 
     # TODO
 

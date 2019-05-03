@@ -3,7 +3,8 @@ import argparse
 import sys
 from configer import Configer
 from loginer import Loginer
-from CVEchecker import Dependencer
+from dependencer import Dependencer
+from injector import Injector
 
 
 def start_configer(settings, url=None):
@@ -24,3 +25,10 @@ def start_dependencer(folder):
     d = Dependencer(folder)
     d.analyse_folder()
     return d
+
+
+def start_injector(url, folder):
+    i = Injector(url, folder)
+    i.start_injection_attacks()
+    return i
+    

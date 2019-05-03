@@ -346,7 +346,7 @@ def re_HTML_GET_POST_Names(html):
         return None
 
     # Trim the names lists
-    names = match.findall(html)
+    names = match.findall(str(html))
     for i in range(length):
         names[i] = names[i].split('"')[1]
 

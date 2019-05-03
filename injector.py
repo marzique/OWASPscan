@@ -34,9 +34,15 @@ class Injector:
         @Return: either successful XSS(JS) snippet or None.
         """
         return xss_check(url_with_get_parameters)
+    
+    def _get_url_domain(self, url):
+        return urlparse(url).netloc
 
     def _get_all_links_recursive(self, url):
         """Return all internal links from website"""
+        
+        # get base domain
+        domain_main = self._get_url_domain(url)
 
         # a queue of urls to be crawled
         new_urls = deque([url])
@@ -54,6 +60,15 @@ class Injector:
         while len(new_urls):
             # move next url from the queue to the set of processed urls
             url = new_urls.popleft()
+
+            # ignore links with hash, to prevent infinity loop 
+            while "#" in url or domain_main != self._get_url_domain(url):
+                if len(new_urls):
+                    url = new_urls.popleft()
+                else:
+                    break
+                    
+            print(url)
             processed_urls.add(url)
             # get url's content
             # print("Processing %s" % url)
@@ -108,7 +123,8 @@ class Injector:
         return param_urls
 
     def xss_attack(self):
-        """Perform xss attack on website, URL = self.url from object
+        """
+        Perform xss attack on website, URL = self.url from object
         return dict containing url: xss_snippet
         """
 
@@ -150,9 +166,13 @@ class Injector:
     ##################   MAIN ALGORITHM   ##################
     ########################################################
 
+    def start_injection_attacks(self):
+        self.xss_attack()
+        self.xml_attack()
+
 
 if __name__ == "__main__":
 
-    injector = Injector("http://rt.rpd.univ.kiev.ua/", "tests")
+    injector = Injector("http://leafus.com.ua", "tests")
     print(injector.xss_attack())
     print(injector.xml_attack())
