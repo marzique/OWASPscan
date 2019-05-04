@@ -9,6 +9,7 @@ import urllib.parse
 from urllib.parse import urlencode
 from re import compile
 from helpers.colors import bcolors
+from bs4 import BeautifulSoup
 
 test_url = "https://xss-game.appspot.com/level1/frame?query=1"
 
@@ -330,25 +331,11 @@ def do_HTTP_request(url, params={}, httpheaders={}):
 
 
 def re_HTML_GET_POST_Names(html):
-    '''
-    RE response html
-    find input NAME
-    @return: name's list[] or None
-    '''
+    """Return all input's names list"""
 
-    # Match specific token
-    match = compile(r'<input name="[^"]*"')
-
-    # Judge if the specific token exist
-    length = len(match.findall(str(html)))
-    if length == 0:
-        print(bcolors.WARNING + "POST Input frame is not found" + bcolors.OKGREEN)
-        return None
-
-    # Trim the names lists
-    names = match.findall(str(html))
-    for i in range(length):
-        names[i] = names[i].split('"')[1]
+    soup = BeautifulSoup(html, "html.parser")
+    inputs = soup.find_all("input")
+    names = [field.get("name") for field in inputs if field.get("name") is not None]
 
     return names
 
