@@ -27,8 +27,8 @@ def start_dependencer(folder):
     return d
 
 
-def start_injector(url, folder, pagelimit):
-    i = Injector(url, folder, pagelimit)
+def start_injector(url, folder, pages):
+    i = Injector(url, folder, pages)
     i.start_injection_attacks()
     return i
     

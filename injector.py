@@ -19,10 +19,10 @@ class Injector:
     store info about vulnurabilities found.
     """
 
-    def __init__(self, url, path_to_folder, page_limit):
+    def __init__(self, url, path_to_folder, all_pages):
         self.url = url
         self.folder = path_to_folder
-        self.page_limit = page_limit
+        self.all_pages = all_pages
         self.links_with_params = []
         self.xss_links = {}  # store url: xss_snippet
         self.injectable_xml_files = {}
@@ -63,8 +63,6 @@ class Injector:
 
         # process urls one by one until we exhaust the queue
         while len(new_urls):
-            if len(processed_urls) > self.page_limit:
-                break
             # move next url from the queue to the set of processed urls
             url = new_urls.popleft()
 
@@ -139,9 +137,7 @@ class Injector:
         """
 
         print(bcolors.OKGREEN + "Searching for XSS injectable URLS...")
-
-        all_urls = self._get_all_links_recursive(self.url)
-        parameter_urls = self._filter_parameter_pages(all_urls)
+        parameter_urls = self._filter_parameter_pages(self.all_pages)
 
         for url in parameter_urls:
             if get_url_domain(url) in self.url:
@@ -214,5 +210,5 @@ class Injector:
 
 if __name__ == "__main__":
 
-    injector = Injector("http://leafus.com.ua", "tests", 150)
+    injector = Injector("http://leafus.com.ua", ".", ["https://fontawesome.com/icons?d=gallery&q=face&m=free"])
     injector.start_injection_attacks()
