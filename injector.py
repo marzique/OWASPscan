@@ -19,9 +19,10 @@ class Injector:
     store info about vulnurabilities found.
     """
 
-    def __init__(self, url, path_to_folder):
+    def __init__(self, url, path_to_folder, page_limit):
         self.url = url
         self.folder = path_to_folder
+        self.page_limit = page_limit
         self.links_with_params = []
         self.xss_links = {}  # store url: xss_snippet
         self.injectable_xml_files = {}
@@ -61,7 +62,7 @@ class Injector:
         broken_urls = set()
 
         # process urls one by one until we exhaust the queue
-        while len(new_urls):
+        while len(new_urls) or len(processed_urls) > self.page_limit:
             # move next url from the queue to the set of processed urls
             url = new_urls.popleft()
 
@@ -165,9 +166,8 @@ class Injector:
                 database_type.append(dbms)
         
         self.sqli_links = injectable_pages
-        if database_type:
-            dbms = most_common(database_type)
-            print(f"Еhe highest probability of DBMS: {dbms}")
+        dbms = most_common(database_type)
+        print(f"The highest probability of DBMS: {dbms}")
 
 
     ########################################################

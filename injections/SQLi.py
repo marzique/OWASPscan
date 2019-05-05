@@ -58,7 +58,10 @@ mssql_messages = ["Microsoft"]
 
 
 def most_common(lst):
-    return max(set(lst), key=lst.count)
+    if lst:
+        return max(set(lst), key=lst.count)
+    else: 
+        return None
 
 
 def sql_inject(url_with_parameters):

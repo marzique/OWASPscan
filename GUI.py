@@ -44,9 +44,7 @@ def execute():
     c = start_configer(settings, url=url)
     l = start_loginer(c)
     d = start_dependencer(folder)
-    i = start_injector(url, folder)
-
-    # TODO
+    i = start_injector(url, folder, settings["page_limit"])
 
     time_minutes = str((time.time() - start) / 60)[:4]
     print(f"OWASPscan took {time_minutes} minutes")

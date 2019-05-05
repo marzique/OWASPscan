@@ -34,7 +34,7 @@ def path_traversal(url):
                 if traversal_url == response.url:
                     if snippet in html_text and "not found" not in html_text:
                         sentence = re.findall(rf"([^.]*?{snippet}[^.]*\.)", html_text)
-                        print(bcolors.FAIL + f"Directory traversal possible, path: {traversal_url}" bcolors.OKGREEN)
+                        print(bcolors.FAIL + f"Directory traversal possible, path: {traversal_url}" + bcolors.OKGREEN)
                         print(bcolors.FAIL + f"Response: {sentence}" + bcolors.OKGREEN)
                         return snippet
                 else:

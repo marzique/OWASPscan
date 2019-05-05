@@ -13,6 +13,8 @@ import socket
 import re
 from datetime import datetime
 from helpers.helpers import strip_url, get_url_domain
+from socket import gethostbyname, socket, AF_INET, SOCK_STREAM
+from tqdm import tqdm
 
 
 class Configer:
@@ -26,7 +28,7 @@ class Configer:
         self.detected = getSimple(self.url)  # web-app confifuration
         self.cookie = self.get_cookie()
         self.date = self.get_date()
-        self.ip = self.get_ip()
+        self.ip, _ = self.get_ip()
         self.location = self.get_location()
         self.encoding = bcolors.OKGREEN + self.r.encoding
         self.server = self.get_server()
@@ -37,6 +39,7 @@ class Configer:
         self.pages = []
         self.adminpages = []
         self.pagelimit = settings["page_limit"]
+        self.open_ports = []
 
     def get_headers(self):
         """Get headers from request and handle possible errors"""
@@ -104,6 +107,9 @@ class Configer:
         print(bcolors.OKGREEN +
               f"Programming language: {self.programming_lang}")
         print(bcolors.OKGREEN + f"Compression: {self.compression}")
+        print(bcolors.OKGREEN +
+              "-----------------------------Open port scanning-----------------------------")
+        self.port_scan()
         print(bcolors.OKGREEN +
               "------------------Search for possible admin/login pages--------------------")
         self.adminpages = search_admin_pages(self.url, progress=0, ext='php' if 'PHP' in self.programming_lang else 'a',
@@ -195,7 +201,7 @@ class Configer:
             if "cloudflare" in str(json_response).lower():
                 ip = bcolors.WARNING
                 end = " [cloudflare]"
-            return ip + json_response["query"] + end + bcolors.OKGREEN
+            return json_response["query"], ip + json_response["query"] + end + bcolors.OKGREEN
         except KeyError:
             return bcolors.CYAN + "hidden" + bcolors.OKGREEN
 
@@ -213,3 +219,30 @@ class Configer:
         except KeyError:
             return bcolors.CYAN + "hidden" + bcolors.OKGREEN
 
+    def port_scan(self):
+        """Return list of active ports"""
+
+        # convert to IPv4
+        # try:       
+        ip = gethostbyname(self.ip)
+        print(f"IPv4: {ip}")
+        # except:
+        #     print(f"Wrong IP address provided")
+        #     return []
+
+        for port in tqdm(range(20, 446)):
+                sckt = socket(AF_INET, SOCK_STREAM)
+                response = sckt.connect_ex((ip,  port))
+                if (response == 0):
+                    clr = bcolors.WARNING
+                    if port in bad_ports:
+                        clr = bcolors.FAIL
+                    print(clr + f"Port {port} is open" + bcolors.OKGREEN)
+                    self.open_ports.append(port)
+        return self.open_ports
+
+
+bad_ports = {21: "ftp", 22: "ssh", 23: "telnet", 
+             25: "smtp", 53: "dns", 80: "http",
+             111: "rpc", 137: "netbios", 443: "https",
+             445: "smb"}
