@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Website analysis report</title>
+
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+
+	<!-- Bootstrap -->
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+	<!-- FontAwesome -->
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+
+	<!-- Font -->
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,700&amp;subset=cyrillic" rel="stylesheet">
+	
+
+	<!-- circle -->
+	<link rel="stylesheet" href="css/circle.css">
+</head>
+<body>
+	<div class="container" id="main">
+		<div class="jumbotron">
+		  <h1 id="website_name"><i class="fas fa-check"></i> <span>http://rex.knu.ua</span></h1>
+		  <p class="lead">Виявлення загроз та вразливостей закінчено. 
+		  	<br> Знизу ви знайдете загальну оцінку захищеності сайту а також розгорнутий аналіз.
+		  </p>
+		</div>
+		<div class="row">
+			<div class="col-md-4 offset-md-4" style="padding-left: 90px;">
+				<div class="c100 p73 big orange" id="centerfuck">
+					<!-- 1-59 - red, 60-74 - orange, 75-100 - green -->
+				  <span>73%</span>
+				  <div class="slice">
+				    <div class="bar"></div>
+				    <div class="fill"></div>
+				  </div>
+				</div>
+			</div>
+		</div>
+				
+		
+		<ul class="nav justify-content-center" id="navigator">
+		  <li class="nav-item">
+		    <a class="nav-link active" href="#configer"><i class="fas fa-frown"></i> Конфігурація</a>
+		  </li>
+		  <li class="nav-item">
+		    <a class="nav-link" href="#loginer"><i class="fas fa-meh"></i> Авторизація</a>
+		  </li>
+		  <li class="nav-item">
+		    <a class="nav-link" href="#dependencer"><i class="fas fa-smile"></i> Залежності</a>
+		  </li>
+		  <li class="nav-item">
+		    <a class="nav-link" href="#injector"><i class="fas fa-frown"></i> Ін'єкції</a>
+		  </li>
+		</ul>
+
+		<p>
+		  <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+		    Докладніше
+		  </button>
+		</p>
+		<div class="collapse" id="collapseExample">
+		  <div class="card card-body">
+		    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
+		  </div>
+		</div>
+	</div>
+
+</body>
+
+<style>
+	body{
+		background-image: linear-gradient(to top, #ebbba7 0%, #cfc7f8 100%);
+		font-family: 'Open Sans Condensed', sans-serif;
+	}
+
+	#main{
+		padding: 50px 10px;
+
+	    /*temporary*/
+	    height: 1200px;
+	}	
+
+	#website_name{
+		text-align: center;
+		margin-bottom: 20px;
+	}
+
+	#website_name span{
+		background-color: #6DCD5F;
+		color: white;
+		font-family: 'Open Sans Condensed', sans-serif;
+		font-weight: 700;
+		padding: 5px;
+	}
+	
+	#website_name .fa-check, .fa-smile{
+		/*nice green*/
+		color: #6DCD5F;
+	}
+
+	.fa-frown{
+		/*sad red*/
+		color: #D3212D;
+	}
+
+	.fa-meh{
+		/*neutral yellowish*/
+		color: #E9D66B;
+	}
+	
+	.jumbotron{
+		background-color: rgba(233,236,239,0.5);
+	}
+
+	.lead{
+		text-align: center;
+		margin-bottom: 20px;
+		font-size: 1.8rem;
+	}
+
+	#navigator{
+		font-size: 2rem;
+	}
+
+	#circbar{
+		float: none;
+    	margin: 0 auto;
+	}
+
+	#centerfuck{
+		margin-left:auto;
+		margin-right:auto;
+		width:240px;
+		height:240px;
+	}
+	
+
+</style>
+
+<script>
+
+</script>
+</html>

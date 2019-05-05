@@ -62,7 +62,9 @@ class Injector:
         broken_urls = set()
 
         # process urls one by one until we exhaust the queue
-        while len(new_urls) or len(processed_urls) > self.page_limit:
+        while len(new_urls):
+            if len(processed_urls) > self.page_limit:
+                break
             # move next url from the queue to the set of processed urls
             url = new_urls.popleft()
 
@@ -73,6 +75,7 @@ class Injector:
                 else:
                     break
 
+            print(url,len(processed_urls))
             processed_urls.add(url)
             # get url's content
             # print("Processing %s" % url)
@@ -211,6 +214,5 @@ class Injector:
 
 if __name__ == "__main__":
 
-    # injector = Injector("http://leafus.com.ua", "tests")
-    # injector.start_injection_attacks()
-    path_traversal("http://172.17.0.2/vulnerabilities/fi/?page=include.php")
+    injector = Injector("http://leafus.com.ua", "tests", 150)
+    injector.start_injection_attacks()
