@@ -1,6 +1,8 @@
 import requests
 import os
 import re
+from helpers.colors import bcolors
+from tqdm import tqdm
 
 
 heuristic_messages = ["root", "www-data", "var/", "www/", 
@@ -18,7 +20,7 @@ def path_traversal(url):
     with open(os.path.abspath(os.getcwd()) + "/assets/paths.txt", "r") as f:
         path_payload = f.readlines()
 
-    for payload in path_payload:
+    for payload in tqdm(path_payload):
         payload = payload.split("\n")[0]
         try:
             url_before_param = url.find("=")
@@ -32,11 +34,11 @@ def path_traversal(url):
                 if traversal_url == response.url:
                     if snippet in html_text and "not found" not in html_text:
                         sentence = re.findall(rf"([^.]*?{snippet}[^.]*\.)", html_text)
-                        print(f"Directory traversal possible, path: {traversal_url}")
-                        print("Response: ", sentence)
+                        print(bcolors.FAIL + f"Directory traversal possible, path: {traversal_url}" bcolors.OKGREEN)
+                        print(bcolors.FAIL + f"Response: {sentence}" + bcolors.OKGREEN)
                         return snippet
                 else:
-                    print(f"Path traversal using {payload} not possible, redirected to {response.url}")
+                    print(bcolors.CYAN + f"Path traversal using {payload} not possible, redirected to {response.url}" + bcolors.OKGREEN)
 
         except KeyboardInterrupt:
             return
