@@ -7,7 +7,6 @@ import urllib.request
 import urllib.error
 import urllib.parse
 from urllib.parse import urlencode
-from re import compile
 from helpers.colors import bcolors
 from bs4 import BeautifulSoup
 

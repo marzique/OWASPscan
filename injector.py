@@ -7,6 +7,7 @@ from collections import deque
 import re
 from injections.XSS_Test import main as xss_check
 from injections.sequel import Sequel as XMLchecker
+from injections.SQLi import sql_inject, most_common
 from helpers.colors import bcolors
 from helpers.helpers import get_url_domain
 
@@ -20,8 +21,10 @@ class Injector:
     def __init__(self, url, path_to_folder):
         self.url = url
         self.folder = path_to_folder
+        self.links_with_params = []
         self.xss_links = {}  # store url: xss_snippet
         self.injectable_xml_files = {}
+        self.sqli_links = {}
         # TODO
 
     ########################################################
@@ -118,6 +121,9 @@ class Injector:
             if parse_qs(parsed.query):
                 param_urls.append(url)
 
+        # update object
+        self.links_with_params = param_urls
+
         return param_urls
 
     def xss_attack(self):
@@ -132,16 +138,35 @@ class Injector:
         parameter_urls = self._filter_parameter_pages(all_urls)
 
         for url in parameter_urls:
-            print(bcolors.OKGREEN + f"\nAttacking {url}")
-            result = self._check_url_for_xss(url)
-            if result:
-                self.xss_links[url] = result
+            if get_url_domain(url) in self.url:
+                print(bcolors.OKGREEN + f"\nAttacking {url}")
+                result = self._check_url_for_xss(url)
+                if result:
+                    self.xss_links[url] = result
 
         return self.xss_links
 
     ########################################################
     ########################   SQL   #######################
     ########################################################
+
+    def sql_attack(self):
+        """Attack every detected page with parameters using list of payloads"""
+        injectable_pages = {}
+        database_type = []
+        
+
+        for page in self.links_with_params:
+            print(bcolors.OKGREEN + f"Injecting  {page}" )
+            injections, dbms = sql_inject(page)
+            injectable_pages[page] = injections
+            database_type.append(dbms)
+        
+        self.sqli_links = injectable_pages
+        if database_type:
+            dbms = most_common(database_type)
+            print(f"Еhe highest probability of DBMS: {dbms}")
+
 
     ########################################################
     ########################   XML   #######################
@@ -167,10 +192,10 @@ class Injector:
     def start_injection_attacks(self):
         self.xss_attack()
         self.xml_attack()
+        self.sql_attack()
 
 
 if __name__ == "__main__":
 
     injector = Injector("http://leafus.com.ua", "tests")
-    print(injector.xss_attack())
-    print(injector.xml_attack())
+    injector.start_injection_attacks()

@@ -6,7 +6,6 @@ import os
 import re
 import sys
 import argparse
-import hashlib
 import time 
 from helpers.colors import bcolors
 from tqdm import tqdm
