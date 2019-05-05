@@ -8,6 +8,7 @@ import re
 from injections.XSS_Test import main as xss_check
 from injections.sequel import Sequel as XMLchecker
 from injections.SQLi import sql_inject, most_common
+from injections.pather import path_traversal
 from helpers.colors import bcolors
 from helpers.helpers import get_url_domain
 
@@ -25,6 +26,7 @@ class Injector:
         self.xss_links = {}  # store url: xss_snippet
         self.injectable_xml_files = {}
         self.sqli_links = {}
+        self.path_traversed = {}
         # TODO
 
     ########################################################
@@ -155,12 +157,12 @@ class Injector:
         injectable_pages = {}
         database_type = []
         
-
-        for page in self.links_with_params:
+        for page in self.links_with_params[:20]: # 20 pages is enough
             print(bcolors.OKGREEN + f"Injecting  {page}" )
             injections, dbms = sql_inject(page)
             injectable_pages[page] = injections
-            database_type.append(dbms)
+            if dbms:
+                database_type.append(dbms)
         
         self.sqli_links = injectable_pages
         if database_type:
@@ -181,9 +183,21 @@ class Injector:
         return self.injectable_xml_files
 
     ########################################################
-    ####################   DESERIALIZE   ###################
+    ##################   PATH TRAVERSAL   ##################
     ########################################################
 
+
+    def path_traversal_attack(self):
+        """Attack every detected page with parameters using list of payloads"""
+        traversed_pages = {}
+        
+        for page in self.links_with_params[:20]: # 20 pages is enough
+            print(bcolors.OKGREEN + f"Traversing path on {page}" )
+            vulnurability = path_traversal(page)
+            if vulnurability:
+                traversed_pages[page] = vulnurability
+
+        self.path_traversed = traversed_pages
 
     ########################################################
     ##################   MAIN ALGORITHM   ##################
@@ -197,5 +211,6 @@ class Injector:
 
 if __name__ == "__main__":
 
-    injector = Injector("http://leafus.com.ua", "tests")
-    injector.start_injection_attacks()
+    # injector = Injector("http://leafus.com.ua", "tests")
+    # injector.start_injection_attacks()
+    path_traversal("http://172.17.0.2/vulnerabilities/fi/?page=include.php")

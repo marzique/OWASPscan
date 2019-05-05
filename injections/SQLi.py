@@ -14,15 +14,10 @@ heuristic_codes = [408, 500, 503, 504, 507, 509, 520, 521, 524]
 defense_codes = [203, 400, 401, 403, 405, 406,
                  409, 423, 429, 451, 499, 511, 525, 526]
 
-heuristic_messages = [" SQL ", " column ", " row ", " table ", " exist ",
-                      " syntax ", " check the manual ", " not found ",
-                      " database ", " update ", " delete ", 
-                      " insert ", " error code ", " unhandled exception ",
-                      " db "
-                      ]  # should use lower() on both strings when checking
+heuristic_messages = [" SQL ", " database ", " db "]  # should use lower() on both strings when checking
 
 # MySQL
-mysql_pattern = r"(?i)error: 1[0-9]{0,3}|1999"
+mysql_pattern = r"(?i)error: 1[0-9]{3}"
 
 # PostgreSQL
 postgres_error_code = ['1000', '0100C', '1008', '1003', '1007', '1006', '1004',
@@ -56,7 +51,7 @@ postgres_error_code = ['1000', '0100C', '1008', '1003', '1007', '1006', '1004',
                        '57P03', '58030', '58P01', '58P02']
 
 # Oracle
-oracle_pattern = r"(?i)ORA-[0-9]{0,5}|65535"
+oracle_pattern = r"(?i)ORA-[0-9]{5}"
 
 # MSSQL
 mssql_messages = ["Microsoft"]
@@ -80,18 +75,12 @@ def sql_inject(url_with_parameters):
     injections = {"time": None, "code": None, "dbms": None, 
                        "size": None, "string": None
                        }
-                    
-    limit = 0
 
     with open(os.path.abspath(os.getcwd()) + "/assets/sqlpayload.txt", "r") as f:
         sql_payload = f.readlines()
     if "=" in url_with_parameters:
         param_spot = str(url_with_parameters).find('=')
         for inject in tqdm(sql_payload):
-
-            # 10 per url is enough
-            if limit >= 10:
-                return injections, most_common(dbms)
 
             if not inject[0] == "#":
                 try:
@@ -107,14 +96,12 @@ def sql_inject(url_with_parameters):
                         print(bcolors.FAIL + f"Possible time based SQLi, page load time: {response_time} seconds" + bcolors.OKGREEN)
                         print(bcolors.FAIL + f"SQLi payload: {inject}" + bcolors.OKGREEN)
                         injections["time"] = inject
-                        limit += 1
 
                     # ERROR BASED (HTTP CODES)
                     if response.status_code in heuristic_codes:
                         print(bcolors.FAIL + f"Possible error based SQLi, error code: {response.status_code}" + bcolors.OKGREEN)
                         print(bcolors.FAIL + f"SQLi payload: {inject}" + bcolors.OKGREEN)
                         injections["code"] = inject
-                        limit += 1
                     elif response.status_code in defense_codes:
                         print(bcolors.CYAN + f"SQLi prevented, error code: {response.status_code}" + bcolors.OKGREEN)
                         print(bcolors.CYAN + f"SQLi payload: {inject}" + bcolors.OKGREEN)
@@ -147,31 +134,26 @@ def sql_inject(url_with_parameters):
                         print(bcolors.FAIL + f"Possible error based SQLi, DBMS: MySQL, error found: {str(mysql)}" + bcolors.OKGREEN)
                         print(bcolors.FAIL + f"SQLi payload: {inject}" + bcolors.OKGREEN)
                         injections["dbms"] = inject
-                        limit += 1
                         dbms += "MySQL"
                     elif oracle:
                         print(bcolors.FAIL + f"Possible error based SQLi, DBMS: Oracle, error found: {str(oracle)}" + bcolors.OKGREEN)
                         print(bcolors.FAIL + f"SQLi payload: {inject}" + bcolors.OKGREEN)
                         injections["dbms"] = inject
-                        limit += 1
                         dbms += "Oracle"
                     elif postgres:
                         print(bcolors.FAIL + f"Possible error based SQLi, DBMS: PostgreSQL, error found: {str(postgres)}" + bcolors.OKGREEN)
                         print(bcolors.FAIL + f"SQLi payload: {inject}" + bcolors.OKGREEN)
                         injections["dbms"] = inject
-                        limit += 1
                         dbms += "PostgreSQL"
                     elif sqlite:
                         print(bcolors.FAIL + f"Possible error based SQLi, DBMS: SQLite, error found: {str(sqlite)}" + bcolors.OKGREEN)
                         print(bcolors.FAIL + f"SQLi payload: {inject}" + bcolors.OKGREEN)
                         injections["dbms"] = inject
-                        limit += 1
                         dbms += "SQLite"
                     elif mssql:
                         print(bcolors.FAIL + f"Possible error based SQLi, DBMS: MSSQL, error found: {str(mssql)}" + bcolors.OKGREEN)
                         print(bcolors.FAIL + f"SQLi payload: {inject}" + bcolors.OKGREEN)
                         injections["dbms"] = inject
-                        limit += 1
                         dbms += "MSSQL"
                     else:
                         for heuristic in heuristic_messages:
@@ -179,7 +161,6 @@ def sql_inject(url_with_parameters):
                                 print(bcolors.FAIL + f"Possible error based SQLi, DBMS: unknown, error found: {heuristic}" + bcolors.OKGREEN)
                                 print(bcolors.FAIL + f"SQLi payload: {inject}" + bcolors.OKGREEN)
                                 injections["string"] = inject
-                                limit += 1
 
                     # ERROR BASED (PAGE SIZE)
                     if standart_size:
@@ -187,7 +168,6 @@ def sql_inject(url_with_parameters):
                         if page_size <= 5120: # 5 KB
                             print(bcolors.FAIL + f"Possible error based SQLi, page_size: {page_size}" + bcolors.OKGREEN)
                             print(bcolors.FAIL + f"SQLi payload: {inject}" + bcolors.OKGREEN)
-                            limit += 1
                             injections["size"] = inject
                     
 
