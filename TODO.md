@@ -36,3 +36,4 @@
 ### Output
 - Fancy PDF (or similar) report with GREEN vs RED parts, connect it with OWASP TOP 10 list
 - Maybe e-mail it.
+- Change circle bar when clicked on particular vulnurability type
