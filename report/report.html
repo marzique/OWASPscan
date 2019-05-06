@@ -19,6 +19,9 @@
 
 	<!-- circle -->
 	<link rel="stylesheet" href="css/circle.css">
+
+	<!-- flagz -->
+	<link rel="stylesheet" href="css/flag-icon.css">
 </head>
 <body>
 	<div class="container" id="main">
@@ -29,13 +32,16 @@
 		  </p>
 		  <div class="row">
 		  	<div class="col-md-4">
-		  		<h4>IP: <span>192.168.100.0</span></h4>
+		  		<h4>Стиснення: <span>gzip</span></h4>
+		  		<h4>Кодування: <span>UTF-8</span></h4>
 		  	</div>
 		  	<div class="col-md-4">
 		  		<h4>Початок сканування: <span>23:45:13</span></h4>
+		  		<h4>Час сканування: <span>00:15:13</span></h4>
 		  	</div>
 		  	<div class="col-md-4">
-		  		<h4>Геолокація: <span>Київ, Україна</span></h4>
+		  		<h4>IP: <span>192.168.100.0</span></h4>
+		  		<h4>Геолокація: <span>Київ, Україна</span> <span class="flag-icon flag-icon-ua"></span></h4>
 		  	</div>
 		  </div>
 		</div>
@@ -70,13 +76,39 @@
 		</ul>
 
 		<p>
-		  <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-		    Докладніше
+		  
+		  <h1>Результати перевірки конфігурації</h1><button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+		    Докладніше 
 		  </button>
 		</p>
+		
+
 		<div class="collapse" id="collapseExample">
 		  <div class="card card-body">
-		    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
+		    <table class="table table-hover">
+			  <tbody>
+			    <tr>
+			      <td>Кукі</td>
+			      <td>PHPSESSID=21k5jn783102vn10nmc1nvsdfwe7</td>
+			      <td>Низька</td>
+			    </tr>
+			    <tr class="table-success">
+			      <td>Захист(HTTPS)</td>
+			      <td>Діє</td>
+			      <td>Висока</td>
+			    </tr class="table-danger">
+			    <tr>
+			      <td>Мова(-и) програмування</td>
+			      <td>["PHP", "Python"]</td>
+			      <td>Середня</td>
+			    </tr>
+			    <tr class="table-danger">
+			      <td>Сервер</td>
+			      <td>Apache</td>
+			      <td>Середня</td>
+			    </tr>
+			  </tbody>
+			</table>
 		  </div>
 		</div>
 	</div>
@@ -126,6 +158,10 @@
 	
 	.jumbotron{
 		background-color: rgba(233,236,239,0.5);
+	}
+
+	.jumbotron .col-md-4{
+		text-align: center;
 	}
 
 	.lead{
