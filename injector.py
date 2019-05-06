@@ -206,6 +206,7 @@ class Injector:
         self.xss_attack()
         self.xml_attack()
         self.sql_attack()
+        self.path_traversal_attack()
 
 
 if __name__ == "__main__":

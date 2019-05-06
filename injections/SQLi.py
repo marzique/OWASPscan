@@ -20,10 +20,7 @@ heuristic_messages = [" SQL ", " database ", " db "]  # should use lower() on bo
 mysql_pattern = r"(?i)error: 1[0-9]{3}"
 
 # PostgreSQL
-postgres_error_code = ['1000', '0100C', '1008', '1003', '1007', '1006', '1004',
-                       '01P01', '2000', '2001', '3000', '8000', '8003', '8006',
-                       '8001', '8004', '8007', '08P01', '9000', '0A000', '0B000',
-                       '0F000', '0F001', '0L000', '0LP01', '0P000', '21000',
+postgres_error_code = ['0F000', '0F001', '0L000', '0LP01', '0P000', '21000',
                        '22000', '2202E', '22021', '22008', '22012', '22005',
                        '2200B', '22022', '22015', '2201E', '2201F', '2201G',
                        '22018', '22007', '22019', '2200D', '22025', '22P06',
@@ -54,7 +51,7 @@ postgres_error_code = ['1000', '0100C', '1008', '1003', '1007', '1006', '1004',
 oracle_pattern = r"(?i)ORA-[0-9]{5}"
 
 # MSSQL
-mssql_messages = ["Microsoft"]
+mssql_messages = ["Microsoft server"]
 
 
 def most_common(lst):
@@ -132,6 +129,7 @@ def sql_inject(url_with_parameters):
                     mssql = []
                     for msg in mssql_messages:
                         mssql = re.findall(rf"([^.]*?{msg.lower()}[^.]*\.)", html_text)
+                    mssql += re.findall(rf"([^.]*?mssql[^.]*\.)", html_text)
 
                     if mysql:
                         print(bcolors.FAIL + f"Possible error based SQLi, DBMS: MySQL, error found: {str(mysql)}" + bcolors.OKGREEN)
@@ -177,6 +175,8 @@ def sql_inject(url_with_parameters):
                 except KeyboardInterrupt:
                     print(bcolors.WARNING + "\nAborted by user...")
                     return None, []
+                except:
+                    pass
         return injections, most_common(dbms)
 
     else:

@@ -19,7 +19,6 @@ from packaging import version
 import time
 
 
-
 class Dependencer():
     """"""
     def __init__(self, path_to_folder):
