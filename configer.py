@@ -29,6 +29,7 @@ class Configer:
         self.cookie = self.get_cookie()
         self.date = self.get_date()
         self.ip, _ = self.get_ip()
+        self.country_code = self.get_country_code(self.ip)
         self.location = self.get_location()
         self.encoding = bcolors.OKGREEN + self.r.encoding
         self.server = self.get_server()
@@ -98,7 +99,7 @@ class Configer:
               "---------------------------------------------------------------------------")
         print(bcolors.OKGREEN + f"HTTP cookie: {self.cookie}")
         print(bcolors.OKGREEN + f"Server IP address: {self.ip}")
-        print(bcolors.OKGREEN + f"Server geo location: {self.location}")
+        print(bcolors.OKGREEN + f"Server geo location: {self.location}, country code: {self.country_code}")
         print(bcolors.OKGREEN + f"Time of connection: {self.date}")
         print(bcolors.OKGREEN + f"Certificate: {self.certificate}")
         print(bcolors.OKGREEN + f"Server type: {self.server}")
@@ -204,7 +205,14 @@ class Configer:
             return json_response["query"], ip + json_response["query"] + end + bcolors.OKGREEN
         except KeyError:
             return bcolors.CYAN + "hidden" + bcolors.OKGREEN
+    
 
+    def get_country_code(self, ip):
+        """Return cntr code"""
+
+        api_request = "http://api.ipstack.com/" + ip +"?access_key=36591df2455de4518e2551dafd2acd77"
+        json_response = requests.get(api_request).json()
+        return json_response["country_code"]
 
 
     def get_location(self):
