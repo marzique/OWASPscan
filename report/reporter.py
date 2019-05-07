@@ -85,3 +85,13 @@ def configer_report(c):
     configuration["percentage"] = int(max_ * 10)
 
     return configuration
+
+
+def loginer_report(l):
+    login_flaws = {}
+
+    if l.bruteforced:
+        login_flaws["bruteforce"] = True
+    else:
+        login_flaws["bruteforce"] = False
+    login_flaws["captcha"] = l.captcha
