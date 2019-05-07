@@ -116,8 +116,7 @@ class Configer:
         self.port_scan()
         print(bcolors.OKGREEN +
               "------------------Search for possible admin/login pages--------------------")
-        self.adminpages = search_admin_pages(self.url, progress=0, ext='php' if 'PHP' in self.programming_lang else 'a',
-                                             wordlist_file="spider/admin_login.txt")
+        self.adminpages = search_admin_pages(self.url, progress=0, wordlist_file="spider/admin_login.txt")
         print(bcolors.OKGREEN +
               f"admin/dashboard pages found: {len(self.adminpages)}")
         print(bcolors.OKGREEN +
@@ -234,12 +233,12 @@ class Configer:
         """Return list of active ports"""
 
         # convert to IPv4
-        # try:       
-        ip = gethostbyname(self.ip)
-        print(f"IPv4: {ip}")
-        # except:
-        #     print(f"Wrong IP address provided")
-        #     return []
+        try:       
+            ip = gethostbyname(self.ip.split("::")[0])
+            print(f"IPv4: {ip}")
+        except:
+            print(f"Wrong IP address provided")
+            return []
 
         for port in tqdm(range(20, 446)):
                 sckt = socket(AF_INET, SOCK_STREAM)
