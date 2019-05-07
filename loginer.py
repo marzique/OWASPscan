@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 import urllib.request
 import requests
 from loginform import fill_login_form
-# from databaser.databaser import
+from databaser.databaser import get_passwords
 
 
 class Loginer:
