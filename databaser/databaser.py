@@ -50,5 +50,4 @@ def get_passwords(path_to_db_file):
 
 
 if __name__ == "__main__":
-    print(get_passwords("loginer.py"))
-    
+    print(get_passwords("site.db"))

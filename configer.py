@@ -94,12 +94,9 @@ class Configer:
         print(bcolors.OKGREEN + "Connecting to " +
               bcolors.OKBLUE + self.url + "..." + bcolors.OKGREEN)
         art.update_progress(2)
-        print(bcolors.OKGREEN +
-              "---------------------------------------------------------------------------")
-        print(bcolors.OKGREEN +
-              "--------------------------CONFIGER SCAN SEARCH-----------------------------")
-        print(bcolors.OKGREEN +
-              "---------------------------------------------------------------------------")
+
+        print(bcolors.OKGREEN + "[CONFIGER SCAN SEARCH]")
+
         print(bcolors.OKGREEN + f"HTTP cookie: {self.cookie_c}")
         print(bcolors.OKGREEN + f"Server IP address: {self.ip_c}")
         print(bcolors.OKGREEN + f"Server geo location: {self.location_c}, country code: {self.country_code}")
@@ -112,23 +109,20 @@ class Configer:
               f"Programming language: {self.programming_lang_c}")
         print(bcolors.OKGREEN + f"Compression: {self.compression_c}")
         print(bcolors.OKGREEN +
-              "-----------------------------Open port scanning-----------------------------")
+              "    Open port scanning")
         self.port_scan()
         print(bcolors.OKGREEN +
-              "------------------Search for possible admin/login pages--------------------")
+              "    Search for possible admin/login pages")
         self.adminpages = search_admin_pages(self.url, progress=0, wordlist_file="spider/admin_login.txt")
         print(bcolors.OKGREEN +
               f"admin/dashboard pages found: {len(self.adminpages)}")
         print(bcolors.OKGREEN +
-              "-----------------------Search for all website pages------------------------")
+              "    Search for all website pages")
         self.pages = self.get_pages(self.url)
         print(bcolors.OKGREEN + f"Webpages found: {len(self.pages)}")
-        print(bcolors.OKGREEN +
-              "---------------------------------------------------------------------------")
-        print(bcolors.OKGREEN +
-              "-----------------------------CONFIGER FINISHED-----------------------------")
-        print(bcolors.OKGREEN +
-              "---------------------------------------------------------------------------")
+
+        print(bcolors.OKGREEN + "[CONFIGER FINISHED]")
+
         print(bcolors.RESET)
 
     def get_server(self):

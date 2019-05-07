@@ -1,4 +1,6 @@
 from helpers.colors import bcolors
+import os
+import time
 from tqdm import tqdm
 from bs4 import BeautifulSoup
 import urllib.request
@@ -10,11 +12,12 @@ from databaser.databaser import get_passwords
 class Loginer:
     """docstring for Loginer"""
 
-    def __init__(self, configer):
+    def __init__(self, configer, folder):
         """TODO: find out if we need to pass whole configer object or just admin pages,
         so it"s maybe will work faster. Or maybe we will make whole admin page finding here separately
         """
         self.url = configer.url
+        self.folder = folder
         self.adminpages = configer.adminpages
         self.filtered_pages = []  # not hidden admin pages with forms!
         self.bruteforced = []
@@ -22,23 +25,23 @@ class Loginer:
         self.users = open('assets/users.txt').readlines()
         self.gap = 100  # max difference between pages to be considered almots the same
         self.captcha = False
+        self.hashing = None
+        self.not_hashed_db = None
 
     def start_hack(self):
+
         print(bcolors.OKGREEN +
-              "---------------------------------------------------------------------------")
-        print(bcolors.OKGREEN +
-              "--------------------------LOGINER SCAN SEARCH------------------------------")
-        print(bcolors.OKGREEN +
-              "---------------------------------------------------------------------------")
+              "[LOGINER SCAN SEARCH]")
+
         self.filtered_pages = self.filter_pages(self.adminpages)
         print(bcolors.OKGREEN + "Bruteforce/Vocabulary check:")
         self.bruteforce_attack(self.filtered_pages)
+
+        print(bcolors.OKGREEN + "Searching for database files:")
+        self.hashing = self.check_password_hashing()
         print(bcolors.OKGREEN +
-              "---------------------------------------------------------------------------")
-        print(bcolors.OKGREEN +
-              "---------------------------LOGINER FINISHED--------------------------------")
-        print(bcolors.OKGREEN +
-              "---------------------------------------------------------------------------")
+              "[LOGINER FINISHED]")
+
 
     def get_raw_html(self, url):
         """Return HTML page from url"""
@@ -182,8 +185,43 @@ class Loginer:
         else:
             print(bcolors.CYAN + f"No bruteforce vulnurable pages found!")
 
-    def vocabulary_attack(self, page_urls):
-        pass
+    
+    def get_db_files(self, folder):
+        """Return list of files with *.db extension"""
+
+        db_files = []
+
+        for root, _, filenames in os.walk(folder):
+            for filename in tqdm(filenames):
+                if filename.endswith(".db"):
+                    file_ = os.path.join(root,filename)
+                    print(bcolors.OKGREEN + f"{file_} found")
+                    db_files.append(file_)
+            time.sleep(0.1)
+        
+        return db_files
+
+    def check_password_hashing(self):
+        """
+        Return True if found passwords stored as hashes, 
+        e.g. all of them same length, has 6
+        """
+
+        db_files = self.get_db_files(self.folder)
+        if db_files:
+            for file_ in db_files:
+                result = get_passwords(file_)
+                if "error" in result:
+                    print(bcolors.WARNING + f"Couldn't read from {file_}")
+                else:
+                    passwords = result["passwords"]
+                    if all(len(i) == len(passwords[0]) for i in passwords):
+                        print(bcolors.CYAN + "Password column contains hashes, no plain passwords detected")
+                        return True
+                    else:
+                        print(bcolors.FAIL + f"Password column in {file_} contains plain passwords!" + bcolors.OKGREEN)
+                        self.not_hashed_db = file_
+                        return False
 
 
 if __name__ == "__main__":

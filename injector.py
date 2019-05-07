@@ -203,11 +203,12 @@ class Injector:
     ########################################################
 
     def start_injection_attacks(self):
+        print(bcolors.OKGREEN + "[INJECTION CHECK]")
         self.xss_attack()
         self.xml_attack()
         self.sql_attack()
         self.path_traversal_attack()
-
+        print(bcolors.OKGREEN + "[INJECTION CHECK FINISHED]")
 
 if __name__ == "__main__":
 

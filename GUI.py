@@ -43,7 +43,7 @@ def execute():
         settings["local"] = True
         
     c = start_configer(settings, url=url)
-    l = start_loginer(c)
+    l = start_loginer(c, folder)
     d = start_dependencer(folder)
     i = start_injector(url, folder, c.pages)
 

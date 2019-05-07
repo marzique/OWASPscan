@@ -16,8 +16,8 @@ def start_configer(settings, url=None):
     c.output_configuration()
     return c
 
-def start_loginer(c):
-    l = Loginer(c)
+def start_loginer(c, folder):
+    l = Loginer(c, folder)
     l.start_hack()
     return l
 

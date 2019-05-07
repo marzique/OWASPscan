@@ -461,9 +461,7 @@ class Dependencer():
         Return list of vulnurabilities
         """
 
-        print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
-        print(bcolors.OKGREEN + "-------------------------CVE DEPENDENCIES CHECK----------------------------")
-        print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
+        print(bcolors.OKGREEN + "[CVE DEPENDENCIES CHECK]")
 
         if not path_to_folder:
             path_to_folder = self.folder
@@ -516,9 +514,7 @@ class Dependencer():
         # update object
         self.vulnurabilities = vulnurabilities
 
-        print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
-        print(bcolors.OKGREEN + "---------------------------CVE CHECK FINISHED------------------------------")
-        print(bcolors.OKGREEN + "---------------------------------------------------------------------------")
+        print(bcolors.OKGREEN + "[CVE CHECK FINISHED]")
 
         return vulnurabilities
 
