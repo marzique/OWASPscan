@@ -4,6 +4,7 @@ from tkinter import messagebox, filedialog
 import os
 from application import start_configer, start_loginer, start_dependencer, start_injector
 import time
+from report.reporter import render_report_in_window
 
 
 settings = {"local": False,
@@ -42,12 +43,16 @@ def execute():
         settings["local"] = True
         
     c = start_configer(settings, url=url)
-    l = start_loginer(c)
-    d = start_dependencer(folder)
-    i = start_injector(url, folder, c.pages)
+    # l = start_loginer(c)
+    # d = start_dependencer(folder)
+    # i = start_injector(url, folder, c.pages)
 
     time_minutes = str((time.time() - start) / 60)[:4]
     print(f"OWASPscan took {time_minutes} minutes")
+    c.elapsed = time_minutes
+    
+    render_report_in_window(c)
+
     sys.exit(1)
 
 def donothing():

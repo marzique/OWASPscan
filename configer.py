@@ -13,6 +13,7 @@ import socket
 import re
 from datetime import datetime
 from helpers.helpers import strip_url, get_url_domain
+from report.reporter import BAD_PORTS
 from socket import gethostbyname, socket, AF_INET, SOCK_STREAM
 from tqdm import tqdm
 
@@ -26,21 +27,23 @@ class Configer:
         self.local = settings['local']       # check if development mode
         self.r = self.get_headers()          # http request header
         self.detected = getSimple(self.url)  # web-app confifuration
-        self.cookie = self.get_cookie()
+        self.cookie, self.cookie_c = self.get_cookie()
         self.date = self.get_date()
-        self.ip, _ = self.get_ip()
+        self.ip, self.ip_c = self.get_ip()
         self.country_code = self.get_country_code(self.ip)
-        self.location = self.get_location()
-        self.encoding = bcolors.OKGREEN + self.r.encoding
-        self.server = self.get_server()
-        self.compression = self.get_compression()
-        self.os = self.get_os()
-        self.programming_lang = self.get_language()
-        self.certificate = self.check_ssl(self.url)
+        self.location, self.location_c = self.get_location()
+        self.encoding = self.r.encoding
+        self.server, self.server_c = self.get_server()
+        self.compression, self.compression_c = self.get_compression()
+        self.os, self.os_c = self.get_os()
+        self.programming_lang, self.programming_lang_c = self.get_language()
+        self.certificate, self.certificate_c = self.check_ssl(self.url)
         self.pages = []
         self.adminpages = []
         self.pagelimit = settings["page_limit"]
         self.open_ports = []
+
+        self.elapsed = None
 
     def get_headers(self):
         """Get headers from request and handle possible errors"""
@@ -63,16 +66,16 @@ class Configer:
 
     def get_compression(self):
         try:
-            return bcolors.OKGREEN + self.r.headers['Content-Encoding'] + bcolors.RESET
+            return self.r.headers['Content-Encoding'], bcolors.OKGREEN + self.r.headers['Content-Encoding'] + bcolors.RESET
         except:
-            return bcolors.CYAN + "hidden" + bcolors.OKGREEN
+            return None, bcolors.CYAN + "hidden" + bcolors.OKGREEN
 
     def get_date(self):
         """Return current GMT from response header or generate it  manually"""
         try:
-            return bcolors.OKGREEN + self.r.headers['Date']
+            return self.r.headers['Date']
         except:
-            return bcolors.OKGREEN + strftime("%a, %d %b %Y %X GMT", gmtime())
+            return strftime("%a, %d %b %Y %X GMT", gmtime())
 
     def output_configuration(self):
         """Print human-readable results of analysis"""
@@ -97,17 +100,17 @@ class Configer:
               "--------------------------CONFIGER SCAN SEARCH-----------------------------")
         print(bcolors.OKGREEN +
               "---------------------------------------------------------------------------")
-        print(bcolors.OKGREEN + f"HTTP cookie: {self.cookie}")
-        print(bcolors.OKGREEN + f"Server IP address: {self.ip}")
-        print(bcolors.OKGREEN + f"Server geo location: {self.location}, country code: {self.country_code}")
+        print(bcolors.OKGREEN + f"HTTP cookie: {self.cookie_c}")
+        print(bcolors.OKGREEN + f"Server IP address: {self.ip_c}")
+        print(bcolors.OKGREEN + f"Server geo location: {self.location_c}, country code: {self.country_code}")
         print(bcolors.OKGREEN + f"Time of connection: {self.date}")
-        print(bcolors.OKGREEN + f"Certificate: {self.certificate}")
-        print(bcolors.OKGREEN + f"Server type: {self.server}")
-        print(bcolors.OKGREEN + f"Operating system: {self.os}")
+        print(bcolors.OKGREEN + f"Certificate: {self.certificate_c}")
+        print(bcolors.OKGREEN + f"Server type: {self.server_c}")
+        print(bcolors.OKGREEN + f"Operating system: {self.os_c}")
         print(bcolors.OKGREEN + f"Content encoding: {self.encoding}")
         print(bcolors.OKGREEN +
-              f"Programming language: {self.programming_lang}")
-        print(bcolors.OKGREEN + f"Compression: {self.compression}")
+              f"Programming language: {self.programming_lang_c}")
+        print(bcolors.OKGREEN + f"Compression: {self.compression_c}")
         print(bcolors.OKGREEN +
               "-----------------------------Open port scanning-----------------------------")
         self.port_scan()
@@ -134,40 +137,40 @@ class Configer:
         highlight 'proxy-like' server name with orange
         """
         try:
-            return bcolors.FAIL + self.detected['web-servers'] + bcolors.RESET
+            return self.detected['web-servers'], bcolors.FAIL + self.detected['web-servers'] + bcolors.RESET
         except:
             try:
-                return bcolors.WARNING + self.r.headers['Server'] + bcolors.RESET
+                return self.r.headers['Server'], bcolors.WARNING + self.r.headers['Server'] + bcolors.RESET
             except:
-                return bcolors.CYAN + 'hidden' + bcolors.RESET
+                return None, bcolors.CYAN + 'hidden' + bcolors.RESET
 
     def get_os(self):
         if not self.local:
             try:
-                return bcolors.FAIL + self.detected['operating-systems'] + bcolors.RESET
+                return self.detected['operating-systems'], bcolors.FAIL + self.detected['operating-systems'] + bcolors.RESET
             except:
-                return bcolors.CYAN + 'hidden' + bcolors.RESET
+                return None, bcolors.CYAN + 'hidden' + bcolors.RESET
         else:
-            return bcolors.WARNING + platform.platform() + bcolors.RESET + bcolors.HEADER + ' [CURRENT PC]' + bcolors.RESET
+            return platform.platform(), bcolors.WARNING + platform.platform() + bcolors.RESET + bcolors.HEADER + ' [CURRENT PC]' + bcolors.RESET
 
     def get_cookie(self):
         try:
-            return bcolors.OKGREEN + self.r.headers['Set-Cookie'] + bcolors.RESET
+            return self.r.headers['Set-Cookie'], bcolors.OKGREEN + self.r.headers['Set-Cookie'] + bcolors.RESET
         except KeyError:
-            return bcolors.FAIL + "hidden" + bcolors.OKGREEN
+            return None, bcolors.FAIL + "hidden" + bcolors.OKGREEN
 
     def get_language(self):
         """Try to get programming language from header"""
         try:
             # 1st try
-            return bcolors.FAIL + str(self.detected['programming-languages']) + bcolors.RESET
+            return str(self.detected['programming-languages']), bcolors.FAIL + str(self.detected['programming-languages']) + bcolors.RESET
         except KeyError:
             try:
                 # 2nd try
-                return bcolors.FAIL + self.r.headers['X-Powered-By'] + bcolors.RESET
+                return self.r.headers['X-Powered-By'], bcolors.FAIL + self.r.headers['X-Powered-By'] + bcolors.RESET
             except KeyError:
                 # TODO: https://www.owasp.org/index.php/Testing_for_HTTP_Parameter_pollution_(OTG-INPVAL-004)
-                return bcolors.CYAN + 'hidden' + bcolors.RESET
+                return None, bcolors.CYAN + 'hidden' + bcolors.RESET
 
     def get_pages(self, url, no_verbose=False):
         """Return list of all webpages"""
@@ -184,10 +187,10 @@ class Configer:
                 OpenSSL.crypto.FILETYPE_PEM, cert)
             date_until = str(datetime.strptime(
                 x509.get_notAfter().decode('ascii'), '%Y%m%d%H%M%SZ'))
-            return '\033[1;36mvalid until ' + date_until
+            return True, '\033[1;36mvalid until ' + date_until
         except ssl.SSLError as e:
             print(e)
-            return bcolors.FAIL + "no OV/DV certificate found"
+            return False, bcolors.FAIL + "no OV/DV certificate found"
 
 
     def get_ip(self):
@@ -204,7 +207,7 @@ class Configer:
                 end = " [cloudflare]"
             return json_response["query"], ip + json_response["query"] + end + bcolors.OKGREEN
         except KeyError:
-            return bcolors.CYAN + "hidden" + bcolors.OKGREEN
+            return None, bcolors.CYAN + "hidden" + bcolors.OKGREEN
     
 
     def get_country_code(self, ip):
@@ -222,10 +225,10 @@ class Configer:
         json_response = requests.get(api_request).json()
 
         try:
-            return bcolors.WARNING + json_response["city"] + ", " + json_response["country"] + bcolors.OKGREEN
+            return json_response["city"] + ", " + json_response["country"], bcolors.WARNING + json_response["city"] + ", " + json_response["country"] + bcolors.OKGREEN
 
         except KeyError:
-            return bcolors.CYAN + "hidden" + bcolors.OKGREEN
+            return None, bcolors.CYAN + "hidden" + bcolors.OKGREEN
 
     def port_scan(self):
         """Return list of active ports"""
@@ -243,14 +246,10 @@ class Configer:
                 response = sckt.connect_ex((ip,  port))
                 if (response == 0):
                     clr = bcolors.WARNING
-                    if port in bad_ports:
+                    if port in BAD_PORTS:
                         clr = bcolors.FAIL
                     print(clr + f"Port {port} is open" + bcolors.OKGREEN)
                     self.open_ports.append(port)
         return self.open_ports
 
 
-bad_ports = {21: "ftp", 22: "ssh", 23: "telnet", 
-             25: "smtp", 53: "dns", 80: "http",
-             111: "rpc", 137: "netbios", 443: "https",
-             445: "smb"}
