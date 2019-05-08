@@ -48,7 +48,7 @@ class Configer:
     def get_headers(self):
         """Get headers from request and handle possible errors"""
         try:
-            r = requests.get(self.url, timeout=3, verify=True)
+            r = requests.get(self.url, timeout=3, verify=False)
             r.raise_for_status()
         except requests.exceptions.HTTPError as errh:
             print("Http Error:", errh)
@@ -75,7 +75,7 @@ class Configer:
         try:
             return self.r.headers['Date']
         except:
-            return strftime("%a, %d %b %Y %X GMT", gmtime())
+            return strftime("a, %d %b %Y %X GMT", gmtime())
 
     def output_configuration(self):
         """Print human-readable results of analysis"""
@@ -191,7 +191,7 @@ class Configer:
 
         api_request = "http://ip-api.com/json/" + get_url_domain(self.url)
         json_response = requests.get(api_request).json()
-        
+
         try:
             ip = bcolors.FAIL
             end = ""
@@ -201,7 +201,7 @@ class Configer:
             return json_response["query"], ip + json_response["query"] + end + bcolors.OKGREEN
         except KeyError:
             return None, bcolors.CYAN + "hidden" + bcolors.OKGREEN
-    
+
 
     def get_country_code(self, ip):
         """Return cntr code"""
@@ -227,23 +227,18 @@ class Configer:
         """Return list of active ports"""
 
         # convert to IPv4
-        try:       
+        try:
             ip = gethostbyname(self.ip.split("::")[0])
             print(f"IPv4: {ip}")
         except:
             print(f"Wrong IP address provided")
             return []
 
-        for port in tqdm(range(20, 446)):
+        for port in tqdm(BAD_PORTS):
             sckt = socket(AF_INET, SOCK_STREAM)
             sckt.settimeout(4)
             response = sckt.connect_ex((ip,  port))
             if (response == 0):
-                clr = bcolors.WARNING
-                if port in BAD_PORTS:
-                    clr = bcolors.FAIL
-                print(clr + f"Port {port} is open" + bcolors.OKGREEN)
+                print(bcolors.FAIL + f"Port {port} is open" + bcolors.OKGREEN)
                 self.open_ports.append(port)
         return self.open_ports
-
-

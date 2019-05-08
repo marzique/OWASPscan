@@ -2,6 +2,7 @@ from jinja2 import Template
 import webbrowser
 import os
 import random
+from datetime import datetime
 
 
 # constants
@@ -43,6 +44,21 @@ def configer_report(c):
     # jumbotron info
     configuration["url"] = c.url
     configuration["cookie"] = c.cookie
+    if configuration["cookie"]:
+        configuration["cookie_age"] = None
+        cookie_expires = [expires.split("=")[1] for expires in configuration["cookie"].split("; ") if expires.startswith("expires")]
+        if cookie_expires:
+            timestart = datetime.strptime(c.date, '%a, %d %b %Y %X GMT')
+            for expire in cookie_expires:
+                timefinish = datetime.strptime(expire, '%a, %d-%b-%Y %X GMT')
+                maxage = (timefinish - timestart)
+                hours = maxage.total_seconds() / 3600
+                if configuration["cookie_age"] is None:
+                    configuration["cookie_age"] = hours
+                elif configuration["cookie_age"] < hours:
+                    configuration["cookie_age"] = hours
+
+
     configuration["compression"] = c.compression
     configuration["encoding"] = c.encoding
     configuration["start_time"] = c.date.split()[4]
@@ -68,7 +84,14 @@ def configer_report(c):
         else:
             configuration["ports"][port] = True
 
-    max_ = 10
+    max_ = 12
+    if configuration["cookie"] and configuration["cookie_age"]:
+        if configuration["cookie_age"] < 24:
+            max_ -= 2 - random.random() / 4
+        elif configuration["cookie_age"] > 24 and configuration["cookie_age"] < 720:
+            max_ -= 1 - random.random() / 4
+    else:
+        max_ -= 2
     if configuration["os"]:
         max_ -= 2 - random.random() / 4
     if configuration["language"]:
@@ -80,7 +103,7 @@ def configer_report(c):
     if not all(configuration["ports"]):
         max_ -= 2 - random.random() / 4
 
-    configuration["percentage"] = int(max_ * 10)
+    configuration["percentage"] = int(max_ * 12)
 
     return configuration
 

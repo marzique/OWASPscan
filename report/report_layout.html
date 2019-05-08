@@ -146,16 +146,25 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr class="table-secondary">
-							<td>Кукі</td>
-
-							{% if configuration["cookie"] %}
-							<td>{{ configuration["cookie"] }}</td>
+						{% if configuration["cookie_age"] %}
+							{% if configuration["cookie_age"] < 24 %}
+							<tr class="table-danger">
+							{% elif configuration["cookie_age"] > 24 and configuration["cookie_age"] < 720 %}
+							<tr class="table-secondary">
 							{% else %}
-							<td>Не виявлено</td>
+							<tr class="table-success">
 							{% endif %}
-							<td>-</td>
-						</tr>
+								<td>Час життя кукі</td>
+								<td>{{ configuration["cookie_age"] }} годин</td>
+								<td>Не виявлено</td>
+							</tr>
+						{% elif configuration["cookie"]%}
+							<tr class="table-danger">
+								<td>Кукі</td>
+								<td>Не заданий максимальний час життя</td>
+								<td>Висока</td>
+							</tr>
+						{% endif %}
 
 
 						{% if configuration["https"]%}
