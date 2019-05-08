@@ -62,7 +62,7 @@
 
 				{% if percentage <= 59 %}
 				{% set color = 'red' %}
-				{% elif cpercentage >= 75 %}
+				{% elif percentage >= 75 %}
 				{% set color = 'green' %}
 				{% else %}
 				{% set color = 'orange' %}
@@ -97,11 +97,11 @@
 				</a>
 			</li>
 			<li class="nav-item">
-				<a class="nav-link" data-toggle="tooltip" data-placement="top" title="{{ auth_info['percentage'] }}%" href="#loginer">
+				<a class="nav-link" data-toggle="tooltip" data-placement="top" title="{{ login_flaws['percentage'] }}%" href="#loginer">
 
-					{% if auth_info['percentage'] <= 59 %}
+					{% if login_flaws['percentage'] <= 59 %}
 					{% set smiley = 'fa-frown' %}
-					{% elif auth_info['percentage'] >= 75 %}
+					{% elif login_flaws['percentage'] >= 75 %}
 					{% set smiley = 'fa-smile' %}
 					{% else %}
 					{% set smiley = 'fa-meh' %}
@@ -297,14 +297,14 @@
 								<td>Висока</td>
 							</tr>
 						{% endif %}
-						
+
 						{% if login_flaws["bruteforce"] %}
 							<tr class="table-danger">
 								<td>Атака брутфорс/словник</td>
 								<td>Наявна на {{ login_flaws["bruteforced"]|length}} сторінках</td>
 								<td>Висока</td>
 							</tr>
-							
+
 							{% for page in login_flaws["bruteforced"]%}
 								<tr class="table-danger">
 									<td>page</td>
@@ -320,7 +320,7 @@
 								<td>Висока</td>
 							</tr>
 						{% endif %}
-						
+
 						{% if login_flaws["hashing"] is none %}
 							<tr class="table-secondary">
 								<td>Хешування паролів</td>

@@ -15,19 +15,19 @@ def render_report_in_window(c, l):
     """Render new file with results"""
 
     configuration = configer_report(c)
-    auth_info = loginer_report(l)
+    login_flaws = loginer_report(l)
     dependencies = None
     injections = None
 
     with open("report/report_layout.html") as file_:
         template = Template(file_.read())
 
-    lst = [configuration["percentage"], auth_info["percentage"]]
+    lst = [configuration["percentage"], login_flaws["percentage"]]
 
     percentage = int(sum(lst) / len(lst) )
 
     with open("report.html", 'w') as filetowrite:
-        html = template.render(configuration=configuration, auth_info=auth_info, percentage=percentage)
+        html = template.render(configuration=configuration, login_flaws=login_flaws, percentage=percentage)
         filetowrite.write(html)
 
     webbrowser.open('file://' + os.path.realpath("report.html"))
@@ -98,12 +98,12 @@ def loginer_report(l):
     login_flaws["hashing"] = l.hashing
     if l.hashing is not None:
         login_flaws["db_file"] = l.db_file
-    
+
     max_ = 9
     if login_flaws["bruteforce"]:
         max_ -= 3 - random.random() / 4
-    if len(login_flaws["bruteforced"]) > 3:
-        max_ -= random.random() / 4
+        if len(login_flaws["bruteforced"]) > 3:
+            max_ -= random.random() / 4
     if not login_flaws["captcha"]:
         max_ -= 2.5 - random.random() / 4
     if not login_flaws["hashing"]:
