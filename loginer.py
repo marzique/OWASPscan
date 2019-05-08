@@ -26,7 +26,7 @@ class Loginer:
         self.gap = 100  # max difference between pages to be considered almots the same
         self.captcha = False
         self.hashing = None
-        self.not_hashed_db = None
+        self.db_file = None
 
     def start_hack(self):
 
@@ -217,10 +217,11 @@ class Loginer:
                     passwords = result["passwords"]
                     if all(len(i) == len(passwords[0]) for i in passwords):
                         print(bcolors.CYAN + "Password column contains hashes, no plain passwords detected")
+                        self.db_file = file_
                         return True
                     else:
                         print(bcolors.FAIL + f"Password column in {file_} contains plain passwords!" + bcolors.OKGREEN)
-                        self.not_hashed_db = file_
+                        self.db_file = file_
                         return False
 
 

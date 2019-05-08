@@ -51,7 +51,7 @@ def execute():
     print(f"OWASPscan took {time_minutes} minutes")
     c.elapsed = time_minutes
     
-    render_report_in_window(c)
+    render_report_in_window(c, l)
 
     sys.exit(1)
 

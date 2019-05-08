@@ -11,27 +11,26 @@ BAD_PORTS = {21: "ftp", 22: "ssh", 23: "telnet",
              445: "smb"}
 
 
-def render_report_in_window(c):
+def render_report_in_window(c, l):
     """Render new file with results"""
 
     configuration = configer_report(c)
-    login = None
+    auth_info = loginer_report(l)
     dependencies = None
     injections = None
 
     with open("report/report_layout.html") as file_:
         template = Template(file_.read())
 
+    lst = [configuration["percentage"], auth_info["percentage"]]
+
+    percentage = int(sum(lst) / len(lst) )
+
     with open("report.html", 'w') as filetowrite:
-        html = template.render(configuration=configuration)
+        html = template.render(configuration=configuration, auth_info=auth_info, percentage=percentage)
         filetowrite.write(html)
 
     webbrowser.open('file://' + os.path.realpath("report.html"))
-
-
-def parse_security_data(c, l, d, i):
-    """Render html page using 4 scan objects"""
-    pass
 
 
 def configer_report(c):
@@ -92,6 +91,24 @@ def loginer_report(l):
 
     if l.bruteforced:
         login_flaws["bruteforce"] = True
+        login_flaws["bruteforced"] = l.bruteforced
     else:
         login_flaws["bruteforce"] = False
     login_flaws["captcha"] = l.captcha
+    login_flaws["hashing"] = l.hashing
+    if l.hashing is not None:
+        login_flaws["db_file"] = l.db_file
+    
+    max_ = 9
+    if login_flaws["bruteforce"]:
+        max_ -= 3 - random.random() / 4
+    if len(login_flaws["bruteforced"]) > 3:
+        max_ -= random.random() / 4
+    if not login_flaws["captcha"]:
+        max_ -= 2.5 - random.random() / 4
+    if not login_flaws["hashing"]:
+        max_ -= 3 - random.random() / 4
+
+    login_flaws["percentage"] = int(max_ * 10)
+
+    return login_flaws

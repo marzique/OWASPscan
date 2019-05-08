@@ -60,16 +60,16 @@
 			<div class="col-md-4 offset-md-4" style="padding-left: 90px;">
 				<!-- 1-59 - red, 60-74 - orange, 75-100 - green -->
 
-				{% if configuration['percentage'] <= 59 %}
+				{% if percentage <= 59 %}
 				{% set color = 'red' %}
-				{% elif configuration['percentage'] >= 75 %}
+				{% elif cpercentage >= 75 %}
 				{% set color = 'green' %}
 				{% else %}
 				{% set color = 'orange' %}
 				{% endif %}
-				<div class="c100 p{{ configuration['percentage'] }} big {{ color }}" id="centerfuck">
+				<div class="c100 p{{ percentage }} big {{ color }}" id="centerfuck">
 
-					<span>{{configuration['percentage']}}%</span>
+					<span>{{percentage}}%</span>
 					<div class="slice">
 						<div class="bar"></div>
 						<div class="fill"></div>
@@ -92,14 +92,22 @@
 					{% set smiley = 'fa-meh' %}
 					{% endif %}
 
-
 					<i class="fas {{ smiley }}"></i>
 					Конфігурація
 				</a>
 			</li>
 			<li class="nav-item">
-				<a class="nav-link" data-toggle="tooltip" data-placement="top" title="70%" href="#loginer">
-					<i class="fas fa-meh"></i>
+				<a class="nav-link" data-toggle="tooltip" data-placement="top" title="{{ auth_info['percentage'] }}%" href="#loginer">
+
+					{% if auth_info['percentage'] <= 59 %}
+					{% set smiley = 'fa-frown' %}
+					{% elif auth_info['percentage'] >= 75 %}
+					{% set smiley = 'fa-smile' %}
+					{% else %}
+					{% set smiley = 'fa-meh' %}
+					{% endif %}
+
+					<i class="fas {{ smiley }}"></i>
 					Авторизація
 				</a>
 			</li>
@@ -275,26 +283,73 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr class="table-secondary">
-							<td>Кукі</td>
-							<td>PHPSESSID=21k5jn783102vn10nmc1nvsdfwe7</td>
-							<td>Низька</td>
-						</tr>
-						<tr class="table-success">
-							<td>Захист(HTTPS)</td>
-							<td>Діє</td>
-							<td>Висока</td>
-						</tr>
-						<tr class="table-danger">
-							<td>Мова(-и) програмування</td>
-							<td>["PHP", "Python"]</td>
-							<td>Середня</td>
-						</tr>
-						<tr class="table-danger">
-							<td>Сервер</td>
-							<td>Apache</td>
-							<td>Середня</td>
-						</tr>
+
+						{% if login_flaws["captcha"] %}
+							<tr class="table-success">
+								<td>CAPTCHA</td>
+								<td>Присутня</td>
+								<td>Висока</td>
+							</tr>
+						{% else %}
+							<tr class="table-danger">
+								<td>CAPTCHA</td>
+								<td>Відсутня</td>
+								<td>Висока</td>
+							</tr>
+						{% endif %}
+						
+						{% if login_flaws["bruteforce"] %}
+							<tr class="table-danger">
+								<td>Атака брутфорс/словник</td>
+								<td>Наявна на {{ login_flaws["bruteforced"]|length}} сторінках</td>
+								<td>Висока</td>
+							</tr>
+							
+							{% for page in login_flaws["bruteforced"]%}
+								<tr class="table-danger">
+									<td>page</td>
+									<td>Наявна</td>
+									<td>Висока</td>
+								</tr>
+							{% endfor %}
+
+						{% else %}
+							<tr class="table-success">
+								<td>Атака брутфорс/словник</td>
+								<td>Відсутня</td>
+								<td>Висока</td>
+							</tr>
+						{% endif %}
+						
+						{% if login_flaws["hashing"] is none %}
+							<tr class="table-secondary">
+								<td>Хешування паролів</td>
+								<td>Невідомо</td>
+								<td>Висока</td>
+							</tr>
+						{% elif login_flaws["hashing"] %}
+							<tr class="table-success">
+								<td>Хешування паролів</td>
+								<td>Наявне</td>
+								<td>Висока</td>
+							</tr>
+							<tr class="table-success">
+								<td>Файл бази даних</td>
+								<td>{{login_flaws["db_file"]}}</td>
+								<td>Висока</td>
+							</tr>
+						{% else %}
+							<tr class="table-danger">
+								<td>Хешування паролів</td>
+								<td>Немає</td>
+								<td>Висока</td>
+							</tr>
+							<tr class="table-danger">
+								<td>Файл без хешування</td>
+								<td>{{login_flaws["db_file"]}}</td>
+								<td>Висока</td>
+							</tr>
+						{% endif %}
 					</tbody>
 				</table>
 			</div>

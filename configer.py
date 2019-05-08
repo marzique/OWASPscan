@@ -235,14 +235,15 @@ class Configer:
             return []
 
         for port in tqdm(range(20, 446)):
-                sckt = socket(AF_INET, SOCK_STREAM)
-                response = sckt.connect_ex((ip,  port))
-                if (response == 0):
-                    clr = bcolors.WARNING
-                    if port in BAD_PORTS:
-                        clr = bcolors.FAIL
-                    print(clr + f"Port {port} is open" + bcolors.OKGREEN)
-                    self.open_ports.append(port)
+            sckt = socket(AF_INET, SOCK_STREAM)
+            sckt.settimeout(4)
+            response = sckt.connect_ex((ip,  port))
+            if (response == 0):
+                clr = bcolors.WARNING
+                if port in BAD_PORTS:
+                    clr = bcolors.FAIL
+                print(clr + f"Port {port} is open" + bcolors.OKGREEN)
+                self.open_ports.append(port)
         return self.open_ports
 
 
