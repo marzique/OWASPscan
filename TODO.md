@@ -1,8 +1,5 @@
 ## bug fixes/features
-- find bloody bug which causes recursive url growth!
-- check/hack FTP
--
-
+- ~check/hack FTP~
 
 ------------
 ### Main Modules
@@ -21,7 +18,7 @@
 - ~try to bruteforce pages - can we or not~
 - ~check vocabulary attack~
 - ~check for CAPTCHA~
-- check db files for users table with password-like fields
+- ~check db files for users table with password-like fields~
 
 ## ~CVE~
 - ~check folder via API~

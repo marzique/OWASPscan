@@ -66,7 +66,6 @@ def configer_report(c):
         if port in BAD_PORTS:
             configuration["ports"][port] = False
         else:
-            s
             configuration["ports"][port] = True
 
     max_ = 10
