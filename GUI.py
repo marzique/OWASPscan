@@ -41,7 +41,7 @@ def execute():
         settings["local"] = False
     elif r_var.get() == "--local":
         settings["local"] = True
-        
+
     c = start_configer(settings, url=url)
     l = start_loginer(c, folder)
     d = start_dependencer(folder)
@@ -50,8 +50,8 @@ def execute():
     time_minutes = str((time.time() - start) / 60)[:4]
     print(f"OWASPscan took {time_minutes} minutes")
     c.elapsed = time_minutes
-    
-    render_report_in_window(c, l, d)
+
+    render_report_in_window(c, l, d, i)
 
     sys.exit(1)
 

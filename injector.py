@@ -15,7 +15,7 @@ from helpers.helpers import get_url_domain
 
 class Injector:
     """
-    Perform various injection attacks/checks, 
+    Perform various injection attacks/checks,
     store info about vulnurabilities found.
     """
 
@@ -41,11 +41,11 @@ class Injector:
         @Return: either successful XSS(JS) snippet or None.
         """
         return xss_check(url_with_get_parameters)
-    
+
 
     def _get_all_links_recursive(self, url):
         """Return all internal links from website"""
-        
+
         # get base domain
         domain_main = get_url_domain(url)
 
@@ -66,7 +66,7 @@ class Injector:
             # move next url from the queue to the set of processed urls
             url = new_urls.popleft()
 
-            # ignore links with hash, to prevent infinity loop 
+            # ignore links with hash, to prevent infinity loop
             while "#" in url or domain_main != get_url_domain(url):
                 if len(new_urls):
                     url = new_urls.popleft()
@@ -156,14 +156,14 @@ class Injector:
         """Attack every detected page with parameters using list of payloads"""
         injectable_pages = {}
         database_type = []
-        
+
         for page in self.links_with_params[:20]: # 20 pages is enough
             print(bcolors.OKGREEN + f"Injecting  {page}" )
             injections, dbms = sql_inject(page)
             injectable_pages[page] = injections
             if dbms:
                 database_type.append(dbms)
-        
+
         self.sqli_links = injectable_pages
         dbms = most_common(database_type)
         print(f"The highest probability of DBMS: {dbms}")
@@ -189,7 +189,7 @@ class Injector:
     def path_traversal_attack(self):
         """Attack every detected page with parameters using list of payloads"""
         traversed_pages = {}
-        
+
         for page in self.links_with_params[:20]: # 20 pages is enough
             print(bcolors.OKGREEN + f"Traversing path on {page}" )
             vulnurability = path_traversal(page)
@@ -213,4 +213,4 @@ class Injector:
 if __name__ == "__main__":
 
     injector = Injector("http://leafus.com.ua", ".", ["https://fontawesome.com/icons?d=gallery&q=face&m=free"])
-    injector.start_injection_attacks()
+    injector.xss_attack()

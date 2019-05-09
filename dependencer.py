@@ -28,6 +28,7 @@ class Dependencer():
         self.languages = []
         self.main_language = None
         self.vulnurabilities = {}
+        self.ok_libs = {}
         # TODO
 
     ########################################################
@@ -43,7 +44,7 @@ class Dependencer():
         # create a list of file and sub directories
         # names in the given directory
         list_of_files = os.listdir(dir_name)
-        
+
         extensions = (".py", ".cs", ".jar", "java", ".php", ".rb")
         all_files = list()
         # Iterate over all the entries
@@ -127,6 +128,8 @@ class Dependencer():
         """
 
         vulnurable = {}
+        ok_libs = {}
+
         fo = open(path_to_requirements, "r")
         dependencies = fo.read().splitlines()
         print(bcolors.OKGREEN + "Checking requirements.txt for Python vulnurabilities:")
@@ -146,8 +149,10 @@ class Dependencer():
                     vulnurable[dependency] = specifier
                 else:
                     print(bcolors.OKGREEN + f"Dependency version is not vulnurable for  {dependency, specifier}" + bcolors.OKGREEN)
+                    ok_libs[dependency] = specifier
             time.sleep (50.0 / 1000.0)
 
+        self.ok_libs = ok_libs
         return vulnurable
 
     ########################################################
@@ -156,14 +161,22 @@ class Dependencer():
 
     def check_php_dependencies(self, path_to_composer_dot_lock):
         """
-        Check composer.lock file for vulnurable dependencies, return list of them. 
+        Check composer.lock file for vulnurable dependencies, return list of them.
         If request limit for API reached - return None.
         """
         # https://github.com/FriendsOfPHP/security-advisories - THANKS FOR API (fuck you for requests limit)!
         #  curl -H "Accept: application/json" https://security.symfony.com/check_lock -F lock=@/path/to/composer.lock
 
+
+
         vulnurable = {}
-        good_ones = {}
+        ok_libs = {}
+
+        with open(path_to_composer_dot_lock) as json_file:
+            data = json.load(json_file)
+            for p in data['packages']:
+                ok_libs[p["name"]] = p["version"]
+
 
         # request to API stuff
         headers = {'Accept': 'application/json',}
@@ -198,10 +211,12 @@ class Dependencer():
                 ver = json_response[k]["version"]
                 print(bcolors.FAIL + f"Vulnurable dependency version found  {k}=={ver}" + bcolors.OKGREEN)
                 vulnurable[k] = ver
+                ok_libs.pop(k, None)
                 time.sleep (50.0 / 1000.0)
         else:
             print(bcolors.OKGREEN + f"No vulnurabilites found")
 
+        self.ok_libs = ok_libs
         return vulnurable
 
     ########################################################
@@ -229,14 +244,14 @@ class Dependencer():
 
         packages_list = {}
 
-        # validate XML 
+        # validate XML
         with open(path_to_packages_dot_config, "rb") as bytes_for_check:
             if not self.xml_validate(bytes_for_check.read(), "assets/packages_config.xsd"):
                 return None
-        
+
         with open(path_to_packages_dot_config, "r") as fo:
             xml = fo.read()
-        
+
         soup = BeautifulSoup(xml, "xml")
         packages = soup.find_all("package")
         for package in packages:
@@ -252,8 +267,15 @@ class Dependencer():
         """
 
         session = HTMLSession()
-        r = session.get(url)
-        r.html.render(sleep=sleep_time)
+        try:
+            r = session.get(url)
+            r.html.render(sleep=sleep_time)
+        except:
+            try:
+                r = session.get(url)
+                r.html.render(sleep=10)
+            except:
+                return None
         return r.html.html
 
 
@@ -266,6 +288,9 @@ class Dependencer():
 
         url = "https://www.sourceclear.com/vulnerability-database/search#query=" + package_name + "%20language:" + language
         html = self.parse_js_html(url)
+        if not html:
+            print(bcolors.WARNING + f"Problem occured during website scrapping. Skipping..." + bcolors.OKGREEN)
+            return None
         soup = BeautifulSoup(html, "html.parser")
 
         # get list of found results
@@ -291,13 +316,14 @@ class Dependencer():
         print(bcolors.WARNING + f"No info availible for {package_name}. Skipping..." + bcolors.OKGREEN)
         return None
 
-            
+
     def check_csharp_dependencies(self, path_to_packages_dot_config):
         """
-        Check packages.config file for vulnurable dependencies, return list of them. 
+        Check packages.config file for vulnurable dependencies, return list of them.
         Using 'https://www.sourceclear.com/vulnerability-database/search#query=' as API
         """
         vulnurable_packages = {}
+        ok_libs = {}
 
         # get dict of packages
         packages = self.csharp_dependencies_dict(path_to_packages_dot_config)
@@ -308,7 +334,10 @@ class Dependencer():
             vulnurabilities_found = self.check_package(package, version, "csharp")
             if vulnurabilities_found is not None and vulnurabilities_found >= 1:
                 vulnurable_packages[package] = version
-        
+            else:
+                ok_libs[package] = version
+
+        self.ok_libs = ok_libs
         return vulnurable_packages
 
 
@@ -342,13 +371,14 @@ class Dependencer():
         for gemline in gems:
             gemname, gem_version = gemline[:-1].split(" (")
             gem_dict[gemname] = gem_version
-        
+
+
         return gem_dict
-        
+
 
     def check_gem_version(self, gem_name):
         """
-        Return gem version from API https://rubygems.org/api/v1/versions/%GEM_NAME%/latest.json, 
+        Return gem version from API https://rubygems.org/api/v1/versions/%GEM_NAME%/latest.json,
         if gem name is wrong (not found) return None
         """
 
@@ -364,10 +394,11 @@ class Dependencer():
 
     def check_ruby_dependencies(self, path_to_gemfile_dot_lock):
         """
-        Check Gemfile.lock file for vulnurable (read outdated) dependencies, 
-        return list of them, if none found return None. 
+        Check Gemfile.lock file for vulnurable (read outdated) dependencies,
+        return list of them, if none found return None.
         """
         vulnurable_gems = {}
+        ok_libs = {}
 
         gems = self.ruby_gems_load(path_to_gemfile_dot_lock)
 
@@ -385,12 +416,13 @@ class Dependencer():
                 vulnurable_gems[gem] = gem_version
             else:
                 print(bcolors.OKGREEN + f"{gem} gem with version {gem_version} is safe, no vulnurabilities found.")
-            
+                ok_libs[gem] = gem_version
+
             time.sleep (50.0 / 1000.0) # ~10 requests per second to not reach limit
 
-
+        self.ok_libs = ok_libs
         return vulnurable_gems
-        
+
 
     ########################################################
     ###########################JAVA#########################
@@ -405,7 +437,7 @@ class Dependencer():
 
         with open(path_to_pom_dot_xml, "r") as fo:
             xml = fo.read()
-        
+
         soup = BeautifulSoup(xml, "xml")
         dependencies = soup.find_all("dependency")
 
@@ -432,10 +464,11 @@ class Dependencer():
 
     def check_java_dependencies(self, path_to_packages_dot_config):
         """
-        Check packages.config file for vulnurable dependencies, return list of them. 
+        Check packages.config file for vulnurable dependencies, return list of them.
         Using 'https://www.sourceclear.com/vulnerability-database/search#query=' as API
         """
         vulnurable_packages = {}
+        ok_libs = {}
 
         # get dict of packages
         packages = self.java_dependencies_dict(path_to_packages_dot_config)
@@ -446,8 +479,10 @@ class Dependencer():
             vulnurabilities_found = self.check_package(package, version, "java")
             if vulnurabilities_found is not None and vulnurabilities_found >= 1:
                 vulnurable_packages[package] = version
+            else:
+                ok_libs[package] = version
 
-        
+        self.ok_libs = ok_libs
         return vulnurable_packages
 
 
@@ -457,8 +492,8 @@ class Dependencer():
 
 
     def analyse_folder(self, path_to_folder=None):
-        """Fetch all filenames, detect main programming language, find file with dependencies, 
-        check dependencies agains DBs, APIs, Scrappers. 
+        """Fetch all filenames, detect main programming language, find file with dependencies,
+        check dependencies agains DBs, APIs, Scrappers.
         Return list of vulnurabilities
         """
 
@@ -482,6 +517,7 @@ class Dependencer():
 
         for language in languages:
             dependency_file = language_dep_files[language]
+
             if dependency_file in filenames:
                 print(bcolors.OKGREEN + f"{dependency_file} file found! Starting scan...")
                 main_config = language
@@ -494,7 +530,7 @@ class Dependencer():
         else:
             print(bcolors.FAIL + f"No dependencies file found for any language. Aborting..." + bcolors.OKGREEN)
             return None
-        
+
         if main_config == "python":
             self.refresh_python_dependencies()
             path = path_to_folder + "/requirements.txt"
@@ -531,10 +567,10 @@ if __name__ == "__main__":
     print(deper.check_php_dependencies("tests/composer.lock"))
 
     # DETECT VULNURABILITIES IN packages.config                 [C#]
-    print(deper.check_csharp_dependencies("tests/packages.config"))   
+    print(deper.check_csharp_dependencies("tests/packages.config"))
 
     # DETECT VULNURABILITIES IN Gemfile.lock                    [Ruby]
     print(deper.check_ruby_dependencies("tests/Gemfile.lock"))
 
     # DETECT VULNURABILITIES IN pom.xml                         [Java]
-    print(deper.check_java_dependencies("tests/pom.xml"))  
+    print(deper.check_java_dependencies("tests/pom.xml"))

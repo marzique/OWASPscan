@@ -23,7 +23,7 @@ def start_loginer(c, folder):
 
 def start_dependencer(folder):
     d = Dependencer(folder)
-    d.analyse_folder()
+    d.analyse_folder(folder)
     return d
 
 
@@ -31,4 +31,3 @@ def start_injector(url, folder, pages):
     i = Injector(url, folder, pages)
     i.start_injection_attacks()
     return i
-    

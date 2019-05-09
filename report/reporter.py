@@ -12,23 +12,26 @@ BAD_PORTS = {21: "ftp", 22: "ssh", 23: "telnet",
              445: "smb"}
 
 
-def render_report_in_window(c, l, d):
+def render_report_in_window(c, l, d, i):
     """Render new file with results"""
 
     configuration = configer_report(c)
     login_flaws = loginer_report(l)
     dependencies = dependencies_report(d)
-    injections = None
+    injections = injections_report(i)
 
     with open("report/report_layout.html") as file_:
         template = Template(file_.read())
 
-    lst = [configuration["percentage"], login_flaws["percentage"], dependencies["percentage"]]
+    lst = [ configuration["percentage"], login_flaws["percentage"],
+           dependencies["percentage"], injections["percentage"] ]
 
     percentage = int(sum(lst) / len(lst) )
 
     with open("report.html", 'w') as filetowrite:
-        html = template.render(configuration=configuration, login_flaws=login_flaws, dependencies=dependencies, percentage=percentage)
+        html = template.render(configuration=configuration, login_flaws=login_flaws,
+                               dependencies=dependencies, percentage=percentage,
+                               injections=injections)
         filetowrite.write(html)
 
     webbrowser.open('file://' + os.path.realpath("report.html"))
@@ -143,39 +146,61 @@ def loginer_report(l):
 
 def dependencies_report(d):
     dependencies = {}
-    if d.vulnurabilities:
+    if d.dependency_file:
         dependencies["dependency_file"] = d.dependency_file
         dependencies["vulnurabilities"] = d.vulnurabilities
+        dependencies["ok_libs"] = d.ok_libs
         dependencies["language"] = d.main_language
-        dependencies["percentage"] = int(random.random() * 10)
+        vuls = len(d.vulnurabilities)
+        if d.ok_libs:
+            total = vuls + len(d.ok_libs)
+        else:
+            total = vuls
+        dependencies["percentage"] = 100 - int(percentage(vuls, total))
+
     else:
         dependencies["vulnurabilities"] = None
         dependencies["percentage"] = 50
-        
+
+
     return dependencies
+
+
+def injections_report(i):
+    injections = {}
+    injections["xss"] = i.xss_links
+    injections["sql"] = i.sqli_links
+    injections["xml"] = i.injectable_xml_files
+    injections["path"] = i.path_traversed
+
+
+    injections["percentage"] = 100 - (len(list(filter(None, injections.values()))) * 25)
+
+    return injections
+
 
 def percentage(value, total, multiply=True):
 	"""
-	Accepts two integers, a value and a total. 
-	
-	The value is divided into the total and then multiplied by 100, 
+	Accepts two integers, a value and a total.
+
+	The value is divided into the total and then multiplied by 100,
 	returning its percentage as a float.
-	
+
 	If you don't want the number multiplied by 100, set the 'multiply'
 	kwarg to False.
-	
+
 	If one of the numbers is zero, a null value is returned.
-	
+
 	h3. Example usage
-	
+
 		>> import calculate
 		>> calculate.percentage(2, 10)
 		20.0
-		
+
 	h3. Documentation
-	
+
 		* "percentage":http://en.wikipedia.org/wiki/Percentage
-	
+
 	"""
 	if not isinstance(value, (int, float)):
 		return ValueError(f"Input values should be a number, your first input is a {type(value)}")
