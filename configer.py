@@ -28,7 +28,7 @@ class Configer:
         self.r = self.get_headers()          # http request header
         self.detected = getSimple(self.url)  # web-app confifuration
         self.cookie, self.cookie_c = self.get_cookie()
-        self.date = self.get_date()
+        self.date = strftime("%a, %d %b %Y %X GMT", gmtime())
         self.ip, self.ip_c = self.get_ip()
         self.country_code = self.get_country_code(self.ip)
         self.location, self.location_c = self.get_location()
@@ -70,12 +70,6 @@ class Configer:
         except:
             return None, bcolors.CYAN + "hidden" + bcolors.OKGREEN
 
-    def get_date(self):
-        """Return current GMT from response header or generate it  manually"""
-        try:
-            return self.r.headers['Date']
-        except:
-            return strftime("a, %d %b %Y %X GMT", gmtime())
 
     def output_configuration(self):
         """Print human-readable results of analysis"""
@@ -94,9 +88,7 @@ class Configer:
         print(bcolors.OKGREEN + "Connecting to " +
               bcolors.OKBLUE + self.url + "..." + bcolors.OKGREEN)
         art.update_progress(2)
-
         print(bcolors.OKGREEN + "[CONFIGER SCAN SEARCH]")
-
         print(bcolors.OKGREEN + f"HTTP cookie: {self.cookie_c}")
         print(bcolors.OKGREEN + f"Server IP address: {self.ip_c}")
         print(bcolors.OKGREEN + f"Server geo location: {self.location_c}, country code: {self.country_code}")
