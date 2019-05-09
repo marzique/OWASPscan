@@ -12,23 +12,23 @@ BAD_PORTS = {21: "ftp", 22: "ssh", 23: "telnet",
              445: "smb"}
 
 
-def render_report_in_window(c, l):
+def render_report_in_window(c, l, d):
     """Render new file with results"""
 
     configuration = configer_report(c)
     login_flaws = loginer_report(l)
-    dependencies = None
+    dependencies = dependencies_report(d)
     injections = None
 
     with open("report/report_layout.html") as file_:
         template = Template(file_.read())
 
-    lst = [configuration["percentage"], login_flaws["percentage"]]
+    lst = [configuration["percentage"], login_flaws["percentage"], dependencies["percentage"]]
 
     percentage = int(sum(lst) / len(lst) )
 
     with open("report.html", 'w') as filetowrite:
-        html = template.render(configuration=configuration, login_flaws=login_flaws, percentage=percentage)
+        html = template.render(configuration=configuration, login_flaws=login_flaws, dependencies=dependencies, percentage=percentage)
         filetowrite.write(html)
 
     webbrowser.open('file://' + os.path.realpath("report.html"))
@@ -141,6 +141,18 @@ def loginer_report(l):
 
     return login_flaws
 
+def dependencies_report(d):
+    dependencies = {}
+    if d.vulnurabilities:
+        dependencies["dependency_file"] = d.dependency_file
+        dependencies["vulnurabilities"] = d.vulnurabilities
+        dependencies["language"] = d.main_language
+        dependencies["percentage"] = int(random.random() * 10)
+    else:
+        dependencies["vulnurabilities"] = None
+        dependencies["percentage"] = 50
+        
+    return dependencies
 
 def percentage(value, total, multiply=True):
 	"""

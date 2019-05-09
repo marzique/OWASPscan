@@ -163,6 +163,7 @@ class Dependencer():
         #  curl -H "Accept: application/json" https://security.symfony.com/check_lock -F lock=@/path/to/composer.lock
 
         vulnurable = {}
+        good_ones = {}
 
         # request to API stuff
         headers = {'Accept': 'application/json',}
@@ -182,7 +183,7 @@ class Dependencer():
             # try to get results via cURL once (after 1st requests attempt)
             print(bcolors.OKGREEN + f"Can't parse via requests, trying cURL call to API" + bcolors.OKGREEN)
             try:
-                cmd = ["curl", "-H", "Accept: application/json", "https://security.symfony.com/check_lock", "-F", "lock=@tests/composer.lock"]
+                cmd = ["curl", "-H", "Accept: application/json", "https://security.symfony.com/check_lock", "-F", f"lock=@{path_to_composer_dot_lock}"]
                 json_response = check_output(cmd)
                 if "error" in json_response:
                     print(bcolors.WARNING + "Request limit for API exceeded!" + bcolors.OKGREEN)

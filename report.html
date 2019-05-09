@@ -35,23 +35,23 @@
 <body>
 	<div class="container" id="main">
 		<div class="jumbotron">
-			<h1 id="website_name"><i class="fas fa-check"></i> <span>http://leafus.com.ua</span></h1>
+			<h1 id="website_name"><i class="fas fa-check"></i> <span>http://rt.rpd.univ.kiev.ua/</span></h1>
 			<p class="lead">Виявлення загроз та вразливостей закінчено.
 				<br> Знизу ви знайдете загальну оцінку захищеності сайту а також розгорнутий аналіз.
 			</p>
 			<div class="row">
 				<div class="col-md-4">
-					<h4>Стиснення: <span>gzip</span></h4>
+					<h4>Стиснення: <span>None</span></h4>
 					<h4>Кодування: <span>UTF-8</span></h4>
 				</div>
 				<div class="col-md-4">
-					<h4>Початок сканування: <span>23:54:38</span></h4>
-					<h4>Час сканування: <span>4.55</span></h4>
+					<h4>Початок сканування: <span>01:10:28</span></h4>
+					<h4>Час сканування: <span>1.96</span></h4>
 				</div>
 				<div class="col-md-4">
-					<h4>IP: <span>104.28.30.252</span></h4>
-					<h4>Геолокація: <span>Montreal, Canada</span> <span
-							class="flag-icon flag-icon-us"></span></h4>
+					<h4>IP: <span>91.202.128.71</span></h4>
+					<h4>Геолокація: <span>Kyiv, Ukraine</span> <span
+							class="flag-icon flag-icon-ua"></span></h4>
 				</div>
 			</div>
 		</div>
@@ -63,9 +63,9 @@
 				
 				
 				
-				<div class="c100 p52 big red" id="centerfuck">
+				<div class="c100 p45 big red" id="centerfuck">
 
-					<span>52%</span>
+					<span>45%</span>
 					<div class="slice">
 						<div class="bar"></div>
 						<div class="fill"></div>
@@ -77,7 +77,7 @@
 
 		<ul class="nav justify-content-center" id="navigator">
 			<li class="nav-item">
-				<a class="nav-link active" data-toggle="tooltip" data-placement="top" title="56%"
+				<a class="nav-link active" data-toggle="tooltip" data-placement="top" title="55%"
 					href="#configer">
 
 					
@@ -89,19 +89,24 @@
 				</a>
 			</li>
 			<li class="nav-item">
-				<a class="nav-link" data-toggle="tooltip" data-placement="top" title="48%" href="#loginer">
+				<a class="nav-link" data-toggle="tooltip" data-placement="top" title="74%" href="#loginer">
+
+					
+					
+					
+
+					<i class="fas fa-meh"></i>
+					Авторизація
+				</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" data-toggle="tooltip" data-placement="top" title="7%" href="#dependencer">
 
 					
 					
 					
 
 					<i class="fas fa-frown"></i>
-					Авторизація
-				</a>
-			</li>
-			<li class="nav-item">
-				<a class="nav-link" data-toggle="tooltip" data-placement="top" title="89%" href="#dependencer">
-					<i class="fas fa-smile"></i>
 					Залежності
 				</a>
 			</li>
@@ -144,9 +149,9 @@
 
 
 						
-						<tr class="table-danger">
+						<tr class="table-success">
 							<td>HTTPS</td>
-							<td>Відсутнє</td>
+							<td>Наявне</td>
 							<td>Висока</td>
 						</tr>
 						
@@ -155,7 +160,7 @@
 						
 						<tr class="table-danger">
 							<td>Мова(-и) програмування</td>
-							<td>['PHP']</td>
+							<td>['Python']</td>
 							<td>Висока</td>
 						</tr>
 						
@@ -163,10 +168,10 @@
 
 						
 							
-								<tr class="table-success">
+								<tr class="table-danger">
 								
 								<td>Сервер</td>
-								<td>cloudflare</td>
+								<td>Apache</td>
 								<td>Висока</td>
 							</tr>
 						
@@ -184,24 +189,42 @@
 
 						<tr class="table-secondary">
 							<td>Знайдені сторінки</td>
-							<td>24</td>
+							<td>1</td>
 							<td>-</td>
 						</tr>
 
 						
-						<tr class="table-danger">
+						<tr class="table-success">
 							<td>Адмін сторінки</td>
-							<td>1</td>
+							<td>Не виявлено</td>
 							<td>Середня</td>
 						</tr>
 						
 
 						<tr class="table-secondary">
 							<td>Відкритих портів</td>
-							<td>2</td>
+							<td>5</td>
 							<td>-</td>
 						</tr>
 
+						
+						<tr class="table-danger">
+							<td>21</td>
+							<td>ftp</td>
+							<td>Висока</td>
+						</tr>
+						
+						<tr class="table-danger">
+							<td>22</td>
+							<td>ssh</td>
+							<td>Висока</td>
+						</tr>
+						
+						<tr class="table-danger">
+							<td>53</td>
+							<td>dns</td>
+							<td>Висока</td>
+						</tr>
 						
 						<tr class="table-danger">
 							<td>80</td>
@@ -252,20 +275,11 @@
 						
 
 						
-							<tr class="table-danger">
+							<tr class="table-success">
 								<td>Атака брутфорс/словник</td>
-								<td>Наявна на 1 сторінках</td>
+								<td>Відсутня</td>
 								<td>Висока</td>
 							</tr>
-
-							
-								<tr class="table-danger">
-									<td>http://leafus.com.ua/admin/</td>
-									<td>Можливе перебирання</td>
-									<td>Висока</td>
-								</tr>
-							
-
 						
 
 						
@@ -306,26 +320,25 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr class="table-secondary">
-							<td>Кукі</td>
-							<td>PHPSESSID=21k5jn783102vn10nmc1nvsdfwe7</td>
-							<td>Низька</td>
-						</tr>
-						<tr class="table-success">
-							<td>Захист(HTTPS)</td>
-							<td>Діє</td>
-							<td>Висока</td>
-						</tr>
-						<tr class="table-danger">
-							<td>Мова(-и) програмування</td>
-							<td>["PHP", "Python"]</td>
-							<td>Середня</td>
-						</tr>
-						<tr class="table-danger">
-							<td>Сервер</td>
-							<td>Apache</td>
-							<td>Середня</td>
-						</tr>
+						
+							<tr class="table-danger">
+								<td>Файл залежностей</td>
+								<td>requirements.txt</td>
+								<td>Висока</td>
+							</tr>
+							<tr class="table-danger">
+								<td>Мова</td>
+								<td>python</td>
+								<td>-</td>
+							</tr>
+							
+								<tr class="table-danger">
+									<td>requests==2.18.4</td>
+									<td><=2.19.1</td>
+									<td>Висока</td>
+								</tr>
+							
+						
 					</tbody>
 				</table>
 			</div>
